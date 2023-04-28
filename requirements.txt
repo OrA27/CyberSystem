@@ -1,1 +1,4 @@
 simplejson
+scapy~=2.5.0
+Deprecated~=1.2.13
+PyQt5~=5.15.9
