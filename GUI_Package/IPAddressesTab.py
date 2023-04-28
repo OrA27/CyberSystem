@@ -70,6 +70,8 @@ class IPAddressTab(QWidget):
             new_ip_to_add = HorizontalBox("IP", self.new_ip_text_field.text())
             self.existing_ips.add_row(new_ip_to_add)
 
+            #TODO use find open ports function and add ip and ports to the list in common variables as a dict
+
             self.new_ip_text_field.clear()
 
         def validate_ip(ip):

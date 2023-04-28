@@ -42,7 +42,9 @@ class HorizontalBox(QWidget):
 
     def remove(self):
         if self.box_type == "IP":
-            pass
+            parent_layout = self.parent()
+            parent_layout.layout.removeWidget(self)
+            #TODO delete ip from common variables
         else:
             raise Exception("Function and ox type mismatch")
 
