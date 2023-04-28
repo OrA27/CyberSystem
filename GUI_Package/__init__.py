@@ -15,27 +15,31 @@ class HorizontalBox(QWidget):
 
         if box_type == "IP":
             self.button = QPushButton("")  # create the button
-            icon_str = 'SP_DialogCancelButton'  # get icon name
+            # get icon name
+            icon_str = 'SP_DialogCancelButton'
+            pixmapi = getattr(QStyle, icon_str)
+            icon = self.style().standardIcon(pixmapi)
+            self.button.setIcon(icon)
+
             self.button.setToolTip("Remove this address")  # set tool tip
             self.button.clicked.connect(self.remove)  # bind action to button click
+
+            # style the button and set icon
+            self.button.setFixedSize(50, 50)
+            self.button.setStyleSheet("border-radius: 25px; background-color: #f2f2f2;")
+
             # add widgets to layout
             self.layout.addWidget(self.label)
             self.layout.addWidget(self.button)
+
         elif box_type == "script":
-            self.button = QCheckBox()  # create the button
-            icon_str = 'SP_DialogApplyButton'  # get icon name
+            self.button = QCheckBox(self.label)  # create the button
             # add widgets to layout
             self.layout.addWidget(self.button)
-            self.layout.addWidget(self.label)
+
         else:
             raise Exception("box type invalid")
 
-        # style the button and set icon
-        self.button.setFixedSize(50, 50)
-        self.button.setStyleSheet("border-radius: 25px; background-color: #f2f2f2;")
-        pixmapi = getattr(QStyle, icon_str)
-        icon = self.style().standardIcon(pixmapi)
-        self.button.setIcon(icon)
 
     def remove(self):
         if self.box_type == "IP":
