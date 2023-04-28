@@ -1,5 +1,7 @@
-import os
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton
+from . import *
+from PyQt5.QtWidgets import *
+from Cyber_Scripts import *
+from GUI_Package import *
 
 
 class CyberScriptsTab(QWidget):
@@ -11,7 +13,7 @@ class CyberScriptsTab(QWidget):
         self.setLayout(self.layout)
 
         # Search for python scripts in the project
-        directory = os.path.join(os.getcwd(), "Cyber Scripts")
+        directory = os.path.join(os.getcwd(), "Cyber_Scripts")
         scripts = [f for f in os.listdir(directory) if f.endswith(".py")]
 
         # Add a list of check boxes to the tab

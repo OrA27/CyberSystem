@@ -4,7 +4,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QHBoxLayout
 # tab classes import
 from IPAddressesTab import IPAddressTab
-from CyberScriptsTab import CyberScriptsTab
+from GUI.CyberScriptsTab import CyberScriptsTab
 from OutputLogsTab import OutputLogsTab
 
 

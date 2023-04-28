@@ -1,10 +1,8 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QSize
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QLabel
 
 from IPAddressesTab import IPAddressTab
-from CyberScriptsTab import CyberScriptsTab
+from GUI.CyberScriptsTab import CyberScriptsTab
 from OutputLogsTab import OutputLogsTab
 
 
