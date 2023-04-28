@@ -1,9 +1,8 @@
 from PyQt5.QtWidgets import *
+import pkgutil
 
 
-# from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
-
-
+# classes
 class HorizontalBox(QWidget):
     def __init__(self, box_type, label_text):
         super().__init__()
@@ -57,3 +56,16 @@ class VerticalBox(QWidget):
 
     def add_row(self, row: QWidget):
         self.layout.addWidget(row)
+
+
+# functions
+def list_package_modules(package_name):
+    """
+    List all the modules of a given package, ignoring any submodules.
+    """
+    package = __import__(package_name)
+    modules = []
+    for importer, modname, ispkg in pkgutil.walk_packages(package.__path__):
+        if not ispkg:
+            modules.append(modname)
+    return modules
