@@ -1,3 +1,4 @@
+import os
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton
 
 
@@ -10,10 +11,8 @@ class CyberScriptsTab(QWidget):
         self.setLayout(self.layout)
 
         # Search for python scripts in the project
-        # This assumes that the Cyber Scripts folder is located in the same directory as the script
-        import os
-        # directory = os.path.join(os.getcwd(), "Cyber Scripts") need to uncomment
-        # scripts = [f for f in os.listdir(directory) if f.endswith(".py")]
+        directory = os.path.join(os.getcwd(), "Cyber Scripts")
+        scripts = [f for f in os.listdir(directory) if f.endswith(".py")]
 
         # Add a list of check boxes to the tab
         self.checkboxes = []
