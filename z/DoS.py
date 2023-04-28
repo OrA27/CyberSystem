@@ -1,10 +1,7 @@
 # imports
-from Utility_Functions import utils as u
 from scapy.layers.inet import *
 import Common_Variables as cmnVar
 from scapy.all import *
-
-# TODO 31/03/2023 alush: ask Nadav why attempting to connect to another PC is not working
 
 
 for target_ip in cmnVar.IP_list:
