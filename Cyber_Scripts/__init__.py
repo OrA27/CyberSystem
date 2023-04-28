@@ -1,4 +1,3 @@
-# imports
 import nmap3
 from scapy.all import *
 import socket as s
