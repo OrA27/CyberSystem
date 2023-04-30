@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt
 import pkgutil
 
 
@@ -26,15 +27,17 @@ class HorizontalBox(QWidget):
             # style the button and set icon
             self.button.setFixedSize(50, 50)
             self.button.setStyleSheet("border-radius: 25px; background-color: #f2f2f2;")
-
             # add widgets to layout
             self.layout.addWidget(self.label)
             self.layout.addWidget(self.button)
 
         elif box_type == "script":
-            self.button = QCheckBox(self.label)  # create the button
+            self.button = QCheckBox()  # create the button
             # add widgets to layout
-            self.layout.addWidget(self.button)
+            self.layout.addWidget(self.button, alignment=Qt.AlignLeft)
+            self.layout.addWidget(self.label, alignment=Qt.AlignLeft)
+            self.layout.setAlignment(Qt.AlignLeft)
+            self.layout.setContentsMargins(0, 10, 0, 10)
 
         else:
             raise Exception("box type invalid")
@@ -54,6 +57,7 @@ class VerticalBox(QWidget):
         super().__init__()
 
         self.layout = QVBoxLayout(self)
+        self.layout.setAlignment(Qt.AlignTop)
         self.setLayout(self.layout)
 
     def add_row(self, row: QWidget):

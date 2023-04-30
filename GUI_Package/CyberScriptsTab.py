@@ -9,14 +9,20 @@ class CyberScriptsTab(QWidget):
         super().__init__()
 
         # Create a layout for the tab
-        self.vertical_box = VerticalBox()
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+
+        # create the box for the scripts
+        self.script_box = VerticalBox()
+        self.layout.addWidget(self.script_box, alignment=Qt.AlignTop)
+
         # Search for python scripts in the project
         scripts = list_package_modules("Cyber_Scripts")
-        # add checkboxes with corresponding
+        # create horizontal box with checkboxes and corresponding names
         for script in scripts:
             h_box = HorizontalBox('script', script)
-            self.vertical_box.add_row(h_box)
+            self.script_box.add_row(h_box)  # add row to the script box
 
         # Add a button to execute the selected python script
         self.button = QPushButton("Begin")
-        self.vertical_box.layout.addWidget(self.button)
+        self.layout.addWidget(self.button, alignment=Qt.AlignRight)
