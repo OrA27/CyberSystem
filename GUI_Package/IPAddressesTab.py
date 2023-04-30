@@ -4,17 +4,21 @@ from PyQt5.QtGui import QFont, QTransform, QIcon
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle
 
 
+# TODO 30/04/2023 Amit: Connect 'enter' keypress to V button.
+# TODO 30/04/2023 Amit: Validate input, both format and authorization.
+
+
 class IPAddressTab(QWidget):
     def __init__(self):
         super().__init__()
 
         # Create a layout for the tab
-        #self.window = VerticalBox()
-        #self.layout = self.window.layout
+        # self.window = VerticalBox()
+        # self.layout = self.window.layout
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
 
-        self.label = QLabel("Your sites addresses:") # ip tab label
+        self.label = QLabel("Your addresses:")  # ip tab label
         self.layout.addWidget(self.label) # add ip tab lable to tabs layout
 
         # add existing ip addresses

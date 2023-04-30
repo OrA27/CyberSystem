@@ -6,6 +6,9 @@ from GUI_Package.CyberScriptsTab import CyberScriptsTab
 from OutputLogsTab import OutputLogsTab
 
 
+# TODO 30/04/2023 Or: add background colors to tabs
+
+
 class TabBar(QtWidgets.QTabBar):
     def tabSizeHint(self, index):
         s = QtWidgets.QTabBar.tabSizeHint(self, index)
