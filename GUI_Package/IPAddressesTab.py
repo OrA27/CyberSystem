@@ -1,7 +1,7 @@
 from . import *
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QTransform, QIcon
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QFrame, QHBoxLayout, QStyle
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle
 
 
 class IPAddressTab(QWidget):
@@ -24,6 +24,7 @@ class IPAddressTab(QWidget):
         self.new_ip_widget = QWidget() # new ip widget to contain new ip layout
         self.new_ip_layout = QHBoxLayout(self.new_ip_widget) # new ip layout to contain new ip text field and button
         self.new_ip_text_field = QLineEdit() # creates new text field for new ip
+        self.new_ip_text_field.setFixedWidth(200)
 
         # creates button to add and validate the new ip
         self.new_ip_button = QPushButton()
@@ -38,6 +39,7 @@ class IPAddressTab(QWidget):
         # add new ip elements to the layout
         self.new_ip_layout.addWidget(self.new_ip_text_field)
         self.new_ip_layout.addWidget(self.new_ip_button)
+        self.new_ip_layout.setAlignment(Qt.AlignLeft)
 
         self.new_ip_widget.setLayout(self.new_ip_layout) # add the new ip layout to new ip widget
         self.new_ip_widget.hide() # hide the new ip widget
@@ -53,6 +55,7 @@ class IPAddressTab(QWidget):
         transform = QTransform().rotate(45)
         rotated_pixmap = plus_icon.pixmap(64, 64).transformed(transform)
         plus_icon = QIcon(rotated_pixmap)
+
         self.button.setIcon(plus_icon)
         self.button.setFixedSize(50, 50)
         self.button.setStyleSheet("border-radius: 25px; background-color: #f2f2f2;")

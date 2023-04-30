@@ -27,9 +27,12 @@ class HorizontalBox(QWidget):
             # style the button and set icon
             self.button.setFixedSize(50, 50)
             self.button.setStyleSheet("border-radius: 25px; background-color: #f2f2f2;")
+            # set size of label
+            self.label.setFixedWidth(190)
+            self.label.setToolTip(self.label.text())
             # add widgets to layout
             self.layout.addWidget(self.label)
-            self.layout.addWidget(self.button)
+            self.layout.addWidget(self.button, alignment=Qt.AlignLeft)
 
         elif box_type == "script":
             self.button = QCheckBox()  # create the button
