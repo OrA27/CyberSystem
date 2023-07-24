@@ -1,7 +1,6 @@
-from . import *
-from PyQt5.QtWidgets import *
+from GUI import *
+from PyQt6.QtWidgets import *
 from Cyber_Scripts import *
-from GUI_Package import *
 
 
 class CyberScriptsTab(QWidget):

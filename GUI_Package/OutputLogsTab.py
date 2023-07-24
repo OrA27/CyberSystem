@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QTextEdit
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTextEdit
 
 
 class OutputLogsTab(QWidget):

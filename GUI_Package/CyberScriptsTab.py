@@ -1,7 +1,8 @@
 from . import *
-from PyQt5.QtWidgets import *
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QFont, QTransform, QIcon
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle
 from Cyber_Scripts import *
-#from GUI_Package import *
 
 
 # TODO 30/04/2023 Or: Add function to 'Begin' button
@@ -17,7 +18,7 @@ class CyberScriptsTab(QWidget):
 
         # create the box for the scripts
         self.script_box = VerticalBox()
-        self.layout.addWidget(self.script_box, alignment=Qt.AlignTop)
+        self.layout.addWidget(self.script_box, alignment=Qt.AlignmentFlag.AlignTop)
 
         # Search for python scripts in the project
         scripts = list_package_modules("Cyber_Scripts")
@@ -28,4 +29,4 @@ class CyberScriptsTab(QWidget):
 
         # Add a button to execute the selected python script
         self.button = QPushButton("Begin")
-        self.layout.addWidget(self.button, alignment=Qt.AlignRight)
+        self.layout.addWidget(self.button, alignment=Qt.AlignmentFlag.AlignRight)
