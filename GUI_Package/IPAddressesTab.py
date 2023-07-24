@@ -45,7 +45,7 @@ class IPAddressTab(QWidget):
         self.new_ip_widget.setLayout(self.new_ip_layout)  # add the new ip layout to new ip widget
         self.new_ip_widget.hide()  # hide the new ip widget
         self.layout.addWidget(self.new_ip_widget)  # add new ip widget to ip tab layout
-        self.setFont(QFont("Ariel", 14))  # set tabs font
+        self.setFont(QFont("Arial", 14))  # set tabs font
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)  # set tabs alignment
 
         # Add a circular button to the tab

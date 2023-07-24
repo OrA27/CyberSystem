@@ -13,19 +13,15 @@ class HorizontalBox(QWidget):
         self.label = QLabel(label_text)
 
         if box_type == "IP":
-            self.button = QPushButton("")  # create the button
-            # get icon name
-            icon_str = 'SP_DialogCancelButton'
-            pixmapi = getattr(QStyle, icon_str)
-            icon = self.style().standardIcon(pixmapi)
-            self.button.setIcon(icon)
+            self.button = QPushButton("")
+            self.button.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
 
             self.button.setToolTip("Remove this address")  # set tool tip
             self.button.clicked.connect(self.remove)  # bind action to button click
 
             # style the button and set icon
             self.button.setFixedSize(50, 50)
-            self.button.setStyleSheet("border-radius: 25px; background-color: #f2f2f2;")
+            self.button.setStyleSheet("border-radius: 25px; background-color: transparent;")
             # set size of label
             self.label.setFixedWidth(190)
             self.label.setToolTip(self.label.text())

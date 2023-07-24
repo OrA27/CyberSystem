@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
 
         # Add tabs to the tab widget
-        self.tabs.addTab(IPAddressTab(), "IP Addresses")
+        self.tabs.addTab(IPAddressTab(), "Addresses")
         self.tabs.addTab(CyberScriptsTab(), "Cyber Scripts")
         self.tabs.addTab(OutputLogsTab(), "Output Logs")
         self.tabs.addTab(QWidget(), "Blank 1")
