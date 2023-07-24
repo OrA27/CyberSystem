@@ -1,7 +1,7 @@
 from . import *
 from PyQt5.QtWidgets import *
 from Cyber_Scripts import *
-from GUI_Package import *
+#from GUI_Package import *
 
 
 # TODO 30/04/2023 Or: Add function to 'Begin' button
