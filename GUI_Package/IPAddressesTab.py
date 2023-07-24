@@ -32,12 +32,9 @@ class IPAddressTab(QWidget):
 
         # creates button to add and validate the new ip
         self.new_ip_button = QPushButton()
-        # icon_str = 'SP_DialogApplyButton'
-        # pixmapi = getattr(QStyle, icon_str)
-        # add_icon = self.style().standardIcon(pixmapi)
-        self.new_ip_button.setIcon(QIcon("SP_DialogApplyButton"))
+        self.new_ip_button.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogApplyButton))
         self.new_ip_button.setFixedSize(50, 50)
-        self.new_ip_button.setStyleSheet("border-radius: 25px; background-color: #f2f2f2;")
+        self.new_ip_button.setStyleSheet("border-radius: 25px; background-color: transparent;")
         self.new_ip_button.clicked.connect(lambda: add_new_ip())
 
         # add new ip elements to the layout
@@ -53,17 +50,14 @@ class IPAddressTab(QWidget):
 
         # Add a circular button to the tab
         self.button = QPushButton()
-        # icon_str = 'SP_TitleBarCloseButton'
-        # pixmapi = getattr(QStyle, icon_str)
-        # plus_icon = self.style().standardIcon(pixmapi)
-        plus_icon = QIcon("SP_TitleBarCloseButton")
-        transform = QTransform().rotate(45)
-        rotated_pixmap = plus_icon.pixmap(64, 64).transformed(transform)
-        plus_icon = QIcon(rotated_pixmap)
+        plus_icon = QIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ToolBarHorizontalExtensionButton))
+        # transform = QTransform().rotate(45)
+        # rotated_pixmap = plus_icon.pixmap(64, 64).transformed(transform)
+        # plus_icon = QIcon(rotated_pixmap)
 
         self.button.setIcon(plus_icon)
         self.button.setFixedSize(50, 50)
-        self.button.setStyleSheet("border-radius: 25px; background-color: #f2f2f2;")
+        self.button.setStyleSheet("border-radius: 25px; background-color: transparent;")
         self.button.clicked.connect(lambda: show_text_field())
         self.layout.addWidget(self.button)
 
