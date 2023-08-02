@@ -1,4 +1,4 @@
-from GUI import *
+from Main import *
 from PyQt6.QtWidgets import *
 from Cyber_Scripts import *
 
