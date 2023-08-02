@@ -52,12 +52,12 @@ class IPAddressTab(QWidget):
 
         # Add a circular button to the tab
         self.button = QPushButton()
-        plus_icon = QIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ToolBarHorizontalExtensionButton))
+        new_row_icon = QIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ToolBarHorizontalExtensionButton))
         # transform = QTransform().rotate(45)
         # rotated_pixmap = plus_icon.pixmap(64, 64).transformed(transform)
         # plus_icon = QIcon(rotated_pixmap)
 
-        self.button.setIcon(plus_icon)
+        self.button.setIcon(new_row_icon)
         self.button.setFixedSize(50, 50)
         self.button.setStyleSheet("border-radius: 25px; background-color: transparent;")
         self.button.clicked.connect(lambda: show_text_field())

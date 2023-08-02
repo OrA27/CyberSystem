@@ -11,9 +11,9 @@ import importlib.util
 
 
 class CyberContainer:
-    def __init__(self, package_name, output_element: QTextEdit):
+    def __init__(self, package_name):
         self.package = package_name
-        self.output = output_element
+        self.output = QTextEdit()
         self.module_obj = None
         self.addresses = []
         self.active_scripts = []
@@ -27,7 +27,7 @@ class CyberContainer:
         module = self.get_script_module(script_name)
         module.execute(address, self.output)
 
-    def simulate(self):
+    def begin(self):
         for address in self.addresses:
             for script in self.active_scripts:
                 self.execute_script(address, script)
