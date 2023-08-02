@@ -1,9 +1,15 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTextEdit
+import datetime
+
+
+# TODO: create new log files each run,
+#  naming convention will be according to current time
 
 
 class OutputLogsTab(QWidget):
     def __init__(self):
         super().__init__()
+        # current_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") # get time stamp of current
 
         # Create a layout for the tab
         self.layout = QVBoxLayout(self)
