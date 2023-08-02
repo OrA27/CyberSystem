@@ -8,9 +8,9 @@ import time
 driver = webdriver.Chrome()
 
 # Replace 'https://example.com' with the URL of the website you want to automate
-#driver.get('https://moodle2023.ruppin.ac.il/login/index.php')
-#driver.get('https://www.facebook.com/')
-#driver.get('https://www.instagram.com/')
+# driver.get('https://moodle2023.ruppin.ac.il/login/index.php')
+# driver.get('https://www.facebook.com/')
+# driver.get('https://www.instagram.com/')
 driver.get('http://localhost:8000/Login.php')
 
 # Wait for the page to load (you can use other wait strategies too)
@@ -19,7 +19,7 @@ time.sleep(2)
 # Find and fill the fields with desired values
 input_elements = driver.find_elements(By.TAG_NAME, "input")  # Replace 'input_field1_id' with the actual ID of the input field
 input_elements = [element for element in input_elements if element.is_displayed()]
-#for element in input_elements:
+# for element in input_elements:
 #    print(f'{element.get_property("name")}')
 # ------ mysql ------
 input_elements[0].send_keys('a@a.a\'/*')
