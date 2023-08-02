@@ -4,13 +4,14 @@ import pkgutil
 
 
 class HorizontalBox(QWidget):
-    def __init__(self, box_type, label_text):
+    def __init__(self, box_type, label_text, func=None):
         super().__init__()
 
         self.layout = QHBoxLayout(self)
         self.setLayout(self.layout)
         self.box_type = box_type
         self.label = QLabel(label_text)
+        self.func = func
 
         if box_type == "IP":
             self.button = QPushButton("")
@@ -44,7 +45,7 @@ class HorizontalBox(QWidget):
         if self.box_type == "IP":
             parent_layout = self.parent()
             parent_layout.layout.removeWidget(self)
-            # TODO delete ip from common variables
+            self.func()
         else:
             raise Exception("Function and box type mismatch")
 

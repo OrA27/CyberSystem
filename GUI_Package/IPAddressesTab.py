@@ -37,7 +37,7 @@ class IPAddressTab(QWidget):
         self.new_ip_button.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogApplyButton))
         self.new_ip_button.setFixedSize(50, 50)
         self.new_ip_button.setStyleSheet("border-radius: 25px; background-color: transparent;")
-        self.new_ip_button.clicked.connect(lambda: add_new_ip())
+        self.new_ip_button.clicked.connect(lambda: self.add_new_ip())
 
         # add new ip elements to the layout
         self.new_ip_layout.addWidget(self.new_ip_text_field)
@@ -60,23 +60,27 @@ class IPAddressTab(QWidget):
         self.button.setIcon(new_row_icon)
         self.button.setFixedSize(50, 50)
         self.button.setStyleSheet("border-radius: 25px; background-color: transparent;")
-        self.button.clicked.connect(lambda: show_text_field())
+        self.button.clicked.connect(lambda: self.show_text_field())
         self.layout.addWidget(self.button)
 
-        def show_text_field():
-            self.new_ip_widget.show()
+    def show_text_field(self):
+        self.new_ip_widget.show()
 
-        def add_new_ip():
-            validate_ip(self.new_ip_text_field.text())
-            self.new_ip_widget.hide()
+    def add_new_ip(self):
+        self.validate_ip(self.new_ip_text_field.text())
+        self.new_ip_widget.hide()
 
-            # new class creation
-            new_ip_to_add = HorizontalBox("IP", self.new_ip_text_field.text())
-            self.existing_ips.add_row(new_ip_to_add)
+        # new class creation
+        new_ip_to_add = HorizontalBox("IP", self.new_ip_text_field.text(), lambda: self.remove())
+        self.existing_ips.add_row(new_ip_to_add)
 
-            # TODO use find open ports function and add ip and ports to the list in common variables as a dict
+        # TODO use find open ports function and add ip and ports to the list in common variables as a dict
 
-            self.new_ip_text_field.clear()
+        self.new_ip_text_field.clear()
 
-        def validate_ip(ip):
-            pass
+    def validate_ip(self, ip):
+        pass
+
+    def remove(self):
+        # TODO delete ip from wherever they are saved
+        print("hello")
