@@ -6,12 +6,14 @@ from GUI_Package.CyberScriptsTab import CyberScriptsTab
 from GUI_Package.OutputLogsTab import OutputLogsTab
 
 import sys
+from cyber_attacks_container import CyberContainer
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.output = QTextEdit()
+        self.cyber_container = CyberContainer("Cyber_Scripts", self.output)
 
         # Create the main window
         self.setWindowTitle("Cyber Security System")
@@ -21,8 +23,8 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
 
         # Add tabs to the tab widget
-        self.tabs.addTab(IPAddressTab(), "Addresses")
-        self.tabs.addTab(CyberScriptsTab(), "Cyber Scripts")
+        self.tabs.addTab(IPAddressTab(self.cyber_container), "Addresses")
+        self.tabs.addTab(CyberScriptsTab(self.cyber_container), "Cyber Scripts")
         self.tabs.addTab(OutputLogsTab(self.output), "Output Logs")
         self.tabs.addTab(QWidget(), "Blank 1")
         self.tabs.addTab(QWidget(), "Blank 2")
@@ -44,6 +46,5 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
-    # cyber = CyberContainer("Cyber_Scripts", window.output)
     window.show()
     sys.exit(app.exec())

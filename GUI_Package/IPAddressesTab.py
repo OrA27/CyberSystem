@@ -2,6 +2,7 @@ from . import *
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QTransform, QIcon
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle
+from Main.cyber_attacks_container import CyberContainer
 
 
 # TODO 30/04/2023 Amit: Connect 'enter' keypress to V button.
@@ -9,12 +10,13 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit
 
 
 class IPAddressTab(QWidget):
-    def __init__(self):
+    def __init__(self, cyber_container: CyberContainer):
         super().__init__()
 
         # Create a layout for the tab
         # self.window = VerticalBox()
         # self.layout = self.window.layout
+        self.cyber_container = cyber_container
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
 

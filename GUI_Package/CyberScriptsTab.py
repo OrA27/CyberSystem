@@ -3,16 +3,17 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QTransform, QIcon
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle
 from Cyber_Scripts import *
-
+from Main.cyber_attacks_container import CyberContainer
 
 # TODO 30/04/2023 Or: Add function to 'Begin' button
 
 
 class CyberScriptsTab(QWidget):
-    def __init__(self):
+    def __init__(self, cyber_container: CyberContainer):
         super().__init__()
 
         # Create a layout for the tab
+        self.cyber_container = cyber_container
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
