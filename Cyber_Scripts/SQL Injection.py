@@ -57,6 +57,3 @@ for injection in injections:
         print('sql injection succeeded')
         exit(0)
 print('sql injection failed')
-
-
-
