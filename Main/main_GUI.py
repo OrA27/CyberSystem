@@ -24,8 +24,8 @@ class MainWindow(QMainWindow):
         # Add tabs to the tab widget
         self.tabs.addTab(IPAddressTab(self.cyber_container), "Addresses")
         self.tabs.addTab(CyberScriptsTab(self.cyber_container), "Cyber Scripts")
+        self.tabs.addTab(QWidget(), "Required Data")
         self.tabs.addTab(OutputLogsTab(self.cyber_container.output), "Output Logs")
-        self.tabs.addTab(QWidget(), "Blank 1")
         self.tabs.addTab(QWidget(), "Blank 2")
 
         # create authors label

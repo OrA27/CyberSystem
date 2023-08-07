@@ -32,9 +32,12 @@ class HorizontalBox(QWidget):
 
         elif box_type == 'script':
             self.button = QCheckBox()  # create the button
+            self.button.setText(label_text)
+            # TODO add connect function to the button
+
             # add widgets to layout
             self.layout.addWidget(self.button, alignment=Qt.AlignmentFlag.AlignLeft)
-            self.layout.addWidget(self.label, alignment=Qt.AlignmentFlag.AlignLeft)
+            # self.layout.addWidget(self.label, alignment=Qt.AlignmentFlag.AlignLeft)
             self.layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
             self.layout.setContentsMargins(0, 10, 0, 10)
 

