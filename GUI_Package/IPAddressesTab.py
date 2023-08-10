@@ -4,6 +4,8 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit
 from Main.cyber_attacks_container import CyberContainer
 import ipaddress
 from urllib.parse import urlparse
+from Cyber_Scripts import *
+from Main import *
 
 
 # TODO 30/04/2023 Amit: Connect 'enter' keypress to V button.
@@ -72,39 +74,39 @@ class IPAddressTab(QWidget):
         self.new_ip_widget.show()
 
     def add_new_ip(self):
-        if self.validate_address():
+        if self.extract_ports():
             self.new_ip_widget.hide()
 
             new_ip_widget = QWidget()
+            new_ip_widget.setObjectName(self.new_ip_text_field.text())
             layout = QHBoxLayout(new_ip_widget)
             new_ip_widget.setLayout(layout)
-            label = QLabel(self.new_ip_text_field.text())
+            new_ip_label = QLabel(self.new_ip_text_field.text())
 
-            button = QPushButton("")
-            button.setIcon(new_ip_widget.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
+            new_ip_button = QPushButton("")
+            new_ip_button.setIcon(new_ip_widget.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
 
-            button.setToolTip("Remove this address")  # set tool tip
-            button.clicked.connect(self.remove)  # bind action to button click
+            new_ip_button.setToolTip("Remove this address")  # set tool tip
+            new_ip_button.clicked.connect(self.remove)  # bind action to button click
 
             # style the button and set icon
-            button.setFixedSize(50, 50)
-            button.setStyleSheet("border-radius: 25px; background-color: transparent;")
+            new_ip_button.setFixedSize(50, 50)
+            new_ip_button.setStyleSheet("border-radius: 25px; background-color: transparent;")
             # set size of label
-            label.setFixedWidth(190)
-            label.setToolTip(label.text())
+            new_ip_label.setFixedWidth(190)
+            new_ip_label.setToolTip(new_ip_label.text())
             # add widgets to layout
-            layout.addWidget(label)
-            layout.addWidget(button, alignment=Qt.AlignmentFlag.AlignLeft)
+            layout.addWidget(new_ip_label)
+            layout.addWidget(new_ip_button, alignment=Qt.AlignmentFlag.AlignLeft)
 
             # self.existing_ips.add_row(new_ip_widget)
             self.existing_addresses.layout().addWidget(new_ip_widget)
-
-            # TODO use find open ports function and add ip and ports to the list in common variables as a dict
 
             self.new_ip_text_field.clear()
         else:
             print("not validate address")
 
+    """
     @staticmethod
     def is_valid_ip_address(input_string):
         try:
@@ -121,10 +123,20 @@ class IPAddressTab(QWidget):
     def validate_address(self):
         address = self.new_ip_text_field.text()
         return self.is_valid_ip_address(address) or self.is_valid_url(address)
+    """
+
+    def extract_ports(self):
+        new_address = self.new_ip_text_field.text()
+        ports = port_discovery(new_address)
+        if not ports:
+            return False
+        self.cyber_container.addresses[new_address] = ports
+        return True
 
     def remove(self):
-        new_address_widget = self.sender().parent()
-        all_addresses_widget = new_address_widget.parent()
+        address_widget = self.sender().parent()
+        address = address_widget.findChild(QLabel).text()
+        all_addresses_widget = address_widget.parent()
         all_addresses_widget_layout = all_addresses_widget.layout()
-        all_addresses_widget_layout.removeWidget(new_address_widget)
-        # TODO delete ip from wherever they are saved
+        all_addresses_widget_layout.removeWidget(address_widget)
+        self.cyber_container.addresses.pop(address)

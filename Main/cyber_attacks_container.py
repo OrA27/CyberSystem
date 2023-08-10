@@ -15,7 +15,7 @@ class CyberContainer:
         self.package = package_name
         self.output = QTextEdit()
         self.module_obj = None
-        self.addresses = []
+        self.addresses = dict()
         self.active_scripts = []
         self.email = ""
 
