@@ -18,16 +18,35 @@ class CyberScriptsTab(QWidget):
         self.setLayout(self.layout)
 
         # create the box for the scripts
-        self.script_box = VerticalBox()
-        self.layout.addWidget(self.script_box, alignment=Qt.AlignmentFlag.AlignTop)
+        self.script_box = QWidget()
+        self.script_box_layout = QVBoxLayout(self.script_box)
+        self.script_box_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.layout.addWidget(self.script_box)
 
         # Search for python scripts in the project
         scripts = list_package_modules("Cyber_Scripts")
         # create horizontal box with checkboxes and corresponding names
         for script in scripts:
-            h_box = HorizontalBox('script', script)
-            self.script_box.add_row(h_box)  # add row to the script box
+            self.new_button_row(script)  # add a new checkbox button for each script
 
         # Add a button to execute the selected python script
         self.button = QPushButton("Begin")
-        self.layout.addWidget(self.button, alignment=Qt.AlignmentFlag.AlignRight)
+        self.layout.addWidget(self.button, Qt.AlignmentFlag.AlignRight)
+
+    def new_button_row(self, btn_text):
+        button_row = QWidget()
+        button_row.setStyleSheet("border: 2px solid red;")
+        row_layout = QHBoxLayout(button_row)  # create a box layout for the button
+
+        button = QCheckBox()  # create button
+        button.setText(btn_text)  # add script name to the button
+        button.clicked.connect(self.click_checkbox)  # connect the click function
+
+        row_layout.addWidget(button, Qt.AlignmentFlag.AlignLeft)  # add button to the layout
+        row_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        row_layout.setContentsMargins(0, 1, 0, 1)
+
+        self.script_box_layout.addWidget(button_row, Qt.AlignmentFlag.AlignLeft)  # add row to script box
+
+    def click_checkbox(self):
+        pass
