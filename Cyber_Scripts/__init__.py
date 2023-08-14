@@ -53,4 +53,4 @@ def port_discovery(address = "127.0.0.1"):
             return allports
 
 
-port_discovery("facebook.com")
+# port_discovery("facebook.com")
