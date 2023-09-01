@@ -15,8 +15,9 @@ class CyberContainer:
         self.package = package_name
         self.output = QTextEdit()
         self.module_obj = None
-        self.addresses = []
+        self.addresses = dict()
         self.active_scripts = []
+        self.email = ""
 
     def get_script_module(self, script_name):
         full_name = f"{self.package}.{script_name}"
@@ -24,6 +25,7 @@ class CyberContainer:
         return module
 
     def execute_script(self, address, script_name):
+        # TODO change execute structure to have "*args"
         module = self.get_script_module(script_name)
         module.execute(address, self.output)
 
