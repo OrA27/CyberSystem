@@ -1,7 +1,7 @@
 import rainbowtables as rt
 
 
-def create_table(wordlists, path="/rainbow_table", file_name="rainbow_table", hash_type="sha256"):
+def create_table(wordlists, path="/rainbow_tables", file_name="rainbow_table", hash_type="sha256"):
     rt.set_directory(path, full_path=False)
     rt.set_filename(file_name)
 
