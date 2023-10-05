@@ -1,5 +1,5 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel, QTextEdit
+from PyQt6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel, QTextEdit, QPushButton
 
 from GUI_Package.IPAddressesTab import IPAddressTab
 from GUI_Package.CyberScriptsTab import CyberScriptsTab
@@ -28,17 +28,23 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(OutputLogsTab(self.cyber_container.output), "Output Logs")
         self.tabs.addTab(QWidget(), "Blank 2")
 
-        # create authors label
+        # create top label
         self.message_of_the_day = QLabel("Testing testing one two three")
 
+        # create begin button
+        self.begin_button = QPushButton("Begin")
+        # self.begin_button.setFixedWidth(200)
+
         # Create a vertical layout for the tab widget
-        self.tab_vbox = QVBoxLayout()
-        self.tab_vbox.addWidget(self.message_of_the_day, alignment=Qt.AlignmentFlag.AlignCenter)
-        self.tab_vbox.addWidget(self.tabs)
+        self.window_vbox = QVBoxLayout()
+        self.window_vbox.addWidget(self.message_of_the_day, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.window_vbox.addWidget(self.tabs)
+        self.window_vbox.addWidget(self.begin_button)  # , alignment=Qt.AlignmentFlag.AlignRight)
+
 
         # Set the main window layout to the horizontal layout
         self.main_widget = QWidget(self)
-        self.main_widget.setLayout(self.tab_vbox)
+        self.main_widget.setLayout(self.window_vbox)
         self.setCentralWidget(self.main_widget)
 
 

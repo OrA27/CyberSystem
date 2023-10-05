@@ -1,5 +1,5 @@
 # import nmap3
-import nmap
+# import nmap
 from scapy.all import *
 import socket as s
 from datetime import datetime
@@ -32,7 +32,7 @@ def get_open_ports_nmap(ip: str, amount: int = 50):
     return open_ports
 """
 
-
+"""
 def port_discovery(address = "127.0.0.1"):
     start = time.time()
     nmScan = nmap.PortScanner()
@@ -54,3 +54,4 @@ def port_discovery(address = "127.0.0.1"):
 
 
 # port_discovery("facebook.com")
+"""

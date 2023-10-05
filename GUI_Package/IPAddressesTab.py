@@ -17,8 +17,6 @@ class IPAddressTab(QWidget):
         super().__init__()
 
         # Create a layout for the tab
-        # self.window = VerticalBox()
-        # self.layout = self.window.layout
         self.cyber_container = cyber_container
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
@@ -60,10 +58,6 @@ class IPAddressTab(QWidget):
         # Add a circular button to the tab
         self.button = QPushButton()
         new_row_icon = QIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ToolBarHorizontalExtensionButton))
-        # transform = QTransform().rotate(45)
-        # rotated_pixmap = plus_icon.pixmap(64, 64).transformed(transform)
-        # plus_icon = QIcon(rotated_pixmap)
-
         self.button.setIcon(new_row_icon)
         self.button.setFixedSize(50, 50)
         self.button.setStyleSheet("border-radius: 25px; background-color: transparent;")
@@ -127,7 +121,7 @@ class IPAddressTab(QWidget):
 
     def extract_ports(self):
         new_address = self.new_ip_text_field.text()
-        ports = port_discovery(new_address)
+        ports = [80, 8080]  # port_discovery(new_address)
         if not ports:
             return False
         self.cyber_container.addresses[new_address] = ports

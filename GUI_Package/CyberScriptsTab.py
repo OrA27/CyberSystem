@@ -31,10 +31,13 @@ class CyberScriptsTab(QWidget):
         for script in scripts:
             self.new_button_row(script)  # add a new checkbox button for each script
 
+        # moved to main window
+        """
         # Add a button to execute the selected python script
         self.button = QPushButton("Begin")
         self.button.setFixedWidth(200)
         self.layout.addWidget(self.button, alignment=Qt.AlignmentFlag.AlignRight)
+        """
 
     def new_button_row(self, btn_text):
         new_script_widget = QWidget()
