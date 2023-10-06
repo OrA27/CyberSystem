@@ -1,10 +1,12 @@
-from . import *
+from GUI_Package import *
 from PyQt6.QtCore import Qt, QItemSelectionModel
 from PyQt6.QtGui import QFont, QTransform, QIcon
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle, QListWidgetItem, \
+    QCheckBox
 from Cyber_Scripts import *
-from Main.cyber_attacks_container import CyberContainer
-from .CyberScriptsTab import CyberScriptsTab
+
+
+# from Main.cyber_attacks_container import CyberContainer
 
 
 class AIOTab(QWidget):
@@ -13,7 +15,6 @@ class AIOTab(QWidget):
 
         # create layout
         self.layout = QVBoxLayout(self)
-        self.setLayout(self.layout)
 
         # create UI box
         self.ui = TabUI()  # self.cyber_container)
@@ -24,6 +25,7 @@ class AIOTab(QWidget):
         # add QWidgets
         self.layout.addWidget(self.ui, alignment=Qt.AlignmentFlag.AlignLeft)
         self.layout.addWidget(self.begin_button, alignment=Qt.AlignmentFlag.AlignRight)
+        self.setLayout(self.layout)
 
     def begin(self):
         self.ui.begin()
@@ -41,18 +43,23 @@ class TabUI(QWidget):
 
         # target forms
 
-        # create layout
-        self.layout = QHBoxLayout(self)
-        self.setLayout(self.layout)
+        # create main layout
+        self.layout = QHBoxLayout(self)  # main layout
+
+        # create target list widget and its layout
+        # self.target_list_widget = QWidget()
+        # self.target_layout = QVBoxLayout(self.target_list_widget)
+        # self.target_list_widget.setLayout(self.target_layout)
 
         # create and add "scripts"
         self.scripts = QListWidget(parent=self)
-        self.load_scripts()
+        self.scripts.itemClicked.connect(self.script_selected)
         self.layout.addWidget(self.scripts)
+        self.load_scripts()
 
         # create and add "existing target objects"
         self.existing_targets_widget = self.existing_targets[self.script_names[0]]
-        self.layout.addWidget(self.existing_targets_widget)
+        self.existing_targets_widget.show()
 
         # connect event functions
         self.scripts.itemClicked.connect(self.script_selected)
@@ -60,20 +67,41 @@ class TabUI(QWidget):
         # create and add "new target objects"
         self.new_targets = None  # once a script is selected create instance of NewTarget()
 
+        # add widgets and set layout
+
+        # self.layout.addWidget(self.target_list_widget)
+        # test - remove later
+        test_widget = QLabel("test test one two three")
+        self.layout.addWidget(test_widget)
+        # end test
+        self.setLayout(self.layout)
+
     def load_scripts(self):
         self.scripts.addItems(self.script_names)
         for script in self.script_names:
-            self.existing_targets[script] = QListWidget(parent=self)
-            self.existing_targets[script].setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
-            self.active_targets[script] = []
+            new_list = QListWidget(parent=self)  # create the respective list widget
+
+            new_list.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
+            new_list.hide()  # hide it
+
+            self.layout.addWidget(new_list)  # add it to the target widget
+            self.active_targets[script] = []  # create the active target list
+
+            # test part - remove later
+            new_list.addItem(script)
+            # end test
+
+            self.existing_targets[script] = new_list
 
     def script_selected(self):
-        self.load_existing_targets()
+        self.change_existing_targets()
         self.load_form()
 
-    def load_existing_targets(self):
+    def change_existing_targets(self):
         script = self.scripts.selectedItems()[0].text()
+        self.existing_targets_widget.hide()
         self.existing_targets_widget = self.existing_targets[script]
+        self.existing_targets_widget.show()
 
     def load_form(self):
         pass
@@ -159,3 +187,9 @@ class NewTarget(QWidget):
 
     def create_row(self, label):
         pass
+
+
+app = QApplication(sys.argv)
+AIO = AIOTab()
+AIO.show()
+sys.exit(app.exec())
