@@ -1,5 +1,5 @@
 from GUI_Package import *
-from PyQt6.QtCore import Qt, QItemSelectionModel
+from PyQt6.QtCore import Qt, QItemSelectionModel, pyqtSignal
 from PyQt6.QtGui import QFont, QTransform, QIcon
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle, QListWidgetItem, \
     QCheckBox
@@ -36,29 +36,27 @@ class TabUI(QWidget):
         super().__init__()
         # attributes
         self.script_names = list_package_modules("Cyber_Scripts")
-
-        # target lists
-        self.existing_targets = {}
-        self.active_targets = {}
-
-        # target forms
+        self.active_script = self.script_names[0]
 
         # create main layout
         self.layout = QHBoxLayout(self)  # main layout
 
-        # create target list widget and its layout
-        # self.target_list_widget = QWidget()
-        # self.target_layout = QVBoxLayout(self.target_list_widget)
-        # self.target_list_widget.setLayout(self.target_layout)
-
         # create and add "scripts"
         self.scripts = QListWidget(parent=self)
-        self.scripts.itemClicked.connect(self.script_selected)
+        self.scripts.itemSelectionChanged.connect(self.script_selected)
         self.layout.addWidget(self.scripts)
-        self.load_scripts()
+
+        # create elements
+        self.existing_targets = {}
+        self.active_targets = {}
+        self.forms = {}
+
+        self.load_ui()
 
         # create and add "existing target objects"
-        self.existing_targets_widget = self.existing_targets[self.script_names[0]]
+        self.existing_targets_widget = self.existing_targets[self.active_script]
+        self.active_form_widget = self.forms[self.active_script]
+        self.scripts.setCurrentRow(0)
         self.existing_targets_widget.show()
 
         # connect event functions
@@ -67,16 +65,10 @@ class TabUI(QWidget):
         # create and add "new target objects"
         self.new_targets = None  # once a script is selected create instance of NewTarget()
 
-        # add widgets and set layout
-
         # self.layout.addWidget(self.target_list_widget)
-        # test - remove later
-        test_widget = QLabel("test test one two three")
-        self.layout.addWidget(test_widget)
-        # end test
         self.setLayout(self.layout)
 
-    def load_scripts(self):
+    def load_ui(self):
         self.scripts.addItems(self.script_names)
         for script in self.script_names:
             new_list = QListWidget(parent=self)  # create the respective list widget
@@ -84,27 +76,51 @@ class TabUI(QWidget):
             new_list.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
             new_list.hide()  # hide it
 
-            self.layout.addWidget(new_list)  # add it to the target widget
+            # add global buttons
+            # create "global buttons"
+            select_all_btn = QPushButton("Select all")
+            deselect_all_btn = QPushButton("Deselect all")
+
+            deselect_all_btn.clicked.connect(self.deselect_all)
+            select_all_btn.clicked.connect(self.select_all)
+            se_itm = QListWidgetItem()
+            dse_itm = QListWidgetItem()
+
+            se_itm.setSizeHint(select_all_btn.sizeHint())
+            dse_itm.setSizeHint(deselect_all_btn.sizeHint())
+
+            new_list.addItem(se_itm)
+            new_list.addItem(dse_itm)
+            new_list.setItemWidget(se_itm, select_all_btn)
+            new_list.setItemWidget(dse_itm, deselect_all_btn)
+
+            new_form = NewTarget(script, new_list)  # create the respective form for the new targets
+            new_form.hide()  # hide it
+
+            self.layout.addWidget(new_list)  # add list to the target widget
+            self.layout.addWidget(new_form)  # add form to the target widget
             self.active_targets[script] = []  # create the active target list
 
-            # test part - remove later
-            new_list.addItem(script)
-            # end test
-
             self.existing_targets[script] = new_list
+            self.forms[script] = new_form
 
     def script_selected(self):
+        self.active_script = self.scripts.selectedItems()[0].text()
         self.change_existing_targets()
         self.load_form()
 
     def change_existing_targets(self):
-        script = self.scripts.selectedItems()[0].text()
         self.existing_targets_widget.hide()
-        self.existing_targets_widget = self.existing_targets[script]
+        self.existing_targets_widget = self.existing_targets[self.active_script]
         self.existing_targets_widget.show()
 
+    # def save_item(self): implemented in newTarget class
+
     def load_form(self):
-        pass
+        self.active_form_widget.hide()
+        self.active_form_widget = self.forms[self.active_script]
+        self.active_form_widget.clear_text_fields()
+        self.active_form_widget.show()
 
     def save_data(self):
         """save all the data in the ui"""
@@ -114,34 +130,65 @@ class TabUI(QWidget):
         """load saved data to the ui"""
         pass
 
-    def load_ui(self):
-        pass
-
     def select_all(self):
-        pass
+        targets: QListWidget = self.existing_targets_widget
+        for index in range(2, targets.count()):
+            item = targets.item(index)
+            widget: TargetListItem = targets.itemWidget(item)
+            widget.active_checkbox.setChecked(True)
 
     def deselect_all(self):
-        pass
+        targets: QListWidget = self.existing_targets_widget
+        for index in range(2, targets.count()):
+            item = targets.item(index)
+            widget: TargetListItem = targets.itemWidget(item)
+            widget.active_checkbox.setChecked(False)
 
     def begin(self):
         pass
 
+    def item_added(self, item: QListWidgetItem):
+        widget = self.existing_targets_widget.itemWidget(item)
+        widget.checkboxStateChanged.connect(self.item_changed)
+        widget.active_checkbox.setCheckState(Qt.CheckState.Checked)
 
-class DataObject(QWidget):
-    def __init__(self, script, data_dict):
-        super().__init__()
+    def item_changed(self, checked, label):
+        active_list = self.active_targets[self.active_script]
+        if checked and label not in active_list:
+            active_list.append(label)
+        else:
+            active_list.remove(label)
+        print(active_list)
 
+
+class Data:
+    def __init__(self, script):
+        self.field_dict = {}
         self.script = script
-        self.data = data_dict
-        self.success = None
-        self.time = -1
+        match script:
+            case "SQL Injection":
+                self.field_dict = {"address": None, "user_name": None}
+            case "RCE":
+                self.field_dict = {"address": None, "view_image": None}
+            case "Data Interception":
+                self.field_dict = {"address": None}
+            case "Dos":
+                self.field_dict = {"address": None}
+            case "Rainbow Table":
+                self.field_dict = {"address": None, "user_name": None, "hashed_password": None}
+            case _:
+                print("error")
+        self.passed = None
+        self.time = None
 
     def get_address(self):
-        return self.data["address"]
+        return self.field_dict["address"]
 
 
 class TargetListItem(QWidget):
-    def __init__(self, script: str, data: DataObject, parent_item: QListWidgetItem, parent_list: QListWidget):
+    checkboxStateChanged = pyqtSignal(bool, str)
+
+    def __init__(self, script: str, data: Data, parent_item: QListWidgetItem, parent_list: QListWidget):
         super().__init__()
         # attributes
         self.parent_item = parent_item
@@ -153,40 +200,82 @@ class TargetListItem(QWidget):
         layout = QHBoxLayout()
 
         # elements
-        active_checkbox = QCheckBox()
-        label = QLabel(self.data.get_address())
+        self.active_checkbox = QCheckBox()
+        self.label = QLabel(self.data.get_address())
         delete_button = QPushButton("X")
 
         delete_button.clicked.connect(self.delete_item)
+        self.active_checkbox.stateChanged.connect(self.checkbox_state_changed)
 
-        layout.addWidget(active_checkbox)
-        layout.addWidget(label)
+        layout.addWidget(self.active_checkbox)
+        layout.addWidget(self.label)
         layout.addWidget(delete_button)
+
         self.setLayout(layout)
 
+    def checkbox_state_changed(self):
+        self.checkboxStateChanged.emit(self.active_checkbox.isChecked(), self.label.text())
+
     def delete_item(self):
+        self.active_checkbox.setChecked(False)
         self.parent_list.takeItem(self.parent_list.row(self.parent_item))
         self.deleteLater()
 
 
 class NewTarget(QWidget):
-    def __init__(self, script):
+    def __init__(self, script, parent_list: QListWidget):
         super().__init__()
-
-        self.label_dict = {
-            "SQL": ["address", "user_name"],
-            "DOS": ["address"],
-            "RCE": ["address", "view"]
-        }
+        self.script = script
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+        self.parent_list = parent_list
         self.field_dict = {}
-        self.create_fields(script)
+        data = Data(script)
+        self.create_fields(data.field_dict.keys())
 
-    def create_fields(self, script):
-        for label in self.label_dict[script]:
+    def create_fields(self, labels):
+        for label in labels:
             self.create_row(label)
+        btn = QPushButton("save")
+        btn.clicked.connect(self.click)
+        self.layout.addWidget(btn)
 
     def create_row(self, label):
-        pass
+        row = QWidget()
+        layout = QHBoxLayout()
+        row.setLayout(layout)
+        label_w = QLabel(label)
+        label_w.setFixedWidth(70)
+        text_w = QLineEdit()
+        layout.addWidget(label_w)
+        layout.addWidget(text_w)
+        self.field_dict[label] = text_w
+        self.layout.addWidget(row)
+
+    def clear_text_fields(self):
+        for label in self.field_dict.keys():
+            self.field_dict[label].clear()
+
+    def validate(self):
+        return True
+
+    def click(self):
+        if not self.validate():
+            return
+        new_data = Data(self.script)
+        for label in self.field_dict.keys():
+            new_data.field_dict[label] = self.field_dict[label].text()
+            # print(label + " : " + self.data.field_dict[label])
+        self.add_item(new_data)
+        self.clear_text_fields()
+
+    def add_item(self, data):
+        item = QListWidgetItem()
+        widget = TargetListItem(self.script, data, item, self.parent_list)
+        item.setSizeHint(widget.sizeHint())
+        self.parent_list.addItem(item)
+        self.parent_list.setItemWidget(item, widget)
+        self.parent_list.parent().item_added(item)
 
 
 app = QApplication(sys.argv)
