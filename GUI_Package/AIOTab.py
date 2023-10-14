@@ -13,10 +13,9 @@ def get_script_module(script_name):
     return module
 
 
-def execute_script(script_name, args):
-    # TODO change execute structure to have "*args"
+def execute_script(script_name, arg):
     module = get_script_module(script_name)
-    return module.execute(*args)
+    return module.execute(*arg)
 
 
 class AIOTab(QWidget):
