@@ -4,7 +4,6 @@ from PyQt6.QtGui import QFont, QTransform, QIcon
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle, QListWidgetItem, \
     QCheckBox
 from Cyber_Scripts import *
-import requests
 import validators
 
 

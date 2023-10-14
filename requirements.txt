@@ -1,7 +1,9 @@
 simplejson
 scapy~=2.5.0
 Deprecated~=1.2.13
-PyQt6
+PyQt6~=6.4.2
 python3-nmap
-selenium
-rainbowtables
+selenium~=4.11.2
+rainbowtables~=1.0.6
+requests~=2.31.0
+validators~=0.22.0
