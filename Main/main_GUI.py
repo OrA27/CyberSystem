@@ -17,14 +17,20 @@ class MainWindow(QMainWindow):
 
         # Create the main window
         self.setWindowTitle("Cyber Security System")
-        self.setGeometry(100, 100, 800, 600)
+        # self.setGeometry(100, 100, 800, 600)
 
         # Create the tab widget
         self.tabs = QTabWidget()
 
+        # Create tabs
+        self.input = AIOTab(self)
+        self.logs = QWidget()
+        self.output = QWidget()
+
         # Add tabs to the tab widget
-        self.tabs.addTab(AIOTab(), "Input")
-        self.tabs.addTab(QWidget(), "Output")
+        self.tabs.addTab(self.input, "Input")
+        self.tabs.addTab(self.logs, "Logs")
+        self.tabs.addTab(self.output, "Output")
 
         # create top label
         self.message_of_the_day = QLabel("Testing testing one two three")

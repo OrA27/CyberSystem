@@ -6,6 +6,8 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit
 from Cyber_Scripts import *
 import validators
 
+from Main.main_GUI import MainWindow
+
 
 def get_script_module(script_name):
     full_name = f"Cyber_Scripts.{script_name}"
@@ -19,14 +21,14 @@ def execute_script(script_name, arg):
 
 
 class AIOTab(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent=parent)
 
         # create layout
         self.layout = QVBoxLayout(self)
 
         # create UI box
-        self.ui = TabUI()  # self.cyber_container)
+        self.ui = TabUI(self)  # self.cyber_container)
         # create button
         self.begin_button = QPushButton("Begin")
         self.begin_button.clicked.connect(self.begin)
@@ -37,15 +39,19 @@ class AIOTab(QWidget):
         self.setLayout(self.layout)
 
     def begin(self):
+        self.begin_button.setEnabled(False)
         self.ui.begin()
+        self.begin_button.setEnabled(True)
 
 
 class TabUI(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent=parent)
         # attributes
         self.script_names = list_package_modules("Cyber_Scripts")
         self.active_script = self.script_names[0]
+        self.raw_data = {}  # key: script ;; value: list of data objects
+        self.container: MainWindow = self.parent().parent()
 
         # create main layout
         self.layout = QHBoxLayout(self)  # main layout
@@ -154,19 +160,30 @@ class TabUI(QWidget):
             widget.active_checkbox.setChecked(False)
 
     def begin(self):
-        for script in self.script_names:
-            qlist: QListWidget = self.existing_targets[script]
-            for i in range(qlist.count()):
-                item = qlist.item(i)
-                widget: TargetListItem = qlist.itemWidget(item)
-                data: Data = widget.data
-                if widget.active_checkbox.isChecked():
-                    if script == "Dos":
-                        pass
-                    start = time.time()
-                    data.passed = execute_script(script, widget.data_to_tuple())
-                    finish = time.time()
-                    data.time = finish - start
+        try:
+            # enable these later
+            # self.container.output.clear()
+            # self.container.logs.clear()
+            for script in self.script_names:
+                qlist: QListWidget = self.existing_targets[script]
+                self.raw_data[script] = []
+                for i in range(2, qlist.count()):
+                    item = qlist.item(i)
+                    widget: TargetListItem = qlist.itemWidget(item)
+                    data: Data = widget.data
+                    if widget.active_checkbox.isChecked():
+                        if script == "Dos":
+                            pass
+                        start = time.time()
+                        data.passed = execute_script(script, widget.data_to_tuple())
+                        finish = time.time()
+                        data.time = finish - start
+
+                        self.raw_data[script].append(data)
+        except:
+            return
+
+        self.export_data()
 
     def item_added(self, item: QListWidgetItem):
         widget = self.existing_targets_widget.itemWidget(item)
@@ -180,6 +197,22 @@ class TabUI(QWidget):
         else:
             active_list.remove(label)
         print(active_list)
+
+    def export_data(self):
+        results = {}
+        for script in self.script_names:
+            # (success rate, avg success time)
+            success_rate = 0
+            avg_time = 0
+            data_list: list = self.raw_data[script]
+            for data in data_list:
+                if data.passed:
+                    success_rate += 1
+                    avg_time += data.time
+            avg_time /= success_rate
+            success_rate /= len(data_list)
+            results[script] = (success_rate, avg_time)
+        # self.container.output.analyze()  # enable later
 
 
 class Data:
