@@ -4,6 +4,8 @@ from PyQt6.QtGui import QFont, QTransform, QIcon
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle, QListWidgetItem, \
     QCheckBox
 from Cyber_Scripts import *
+import requests
+import validators
 
 
 # from Main.cyber_attacks_container import CyberContainer
@@ -167,15 +169,15 @@ class Data:
         self.script = script
         match script:
             case "SQL Injection":
-                self.field_dict = {"address": None, "user_name": None}
+                self.field_dict = {"address": None, "user name": None}
             case "RCE":
-                self.field_dict = {"address": None, "view_image": None}
+                self.field_dict = {"address": None, "view image": None}
             case "Data Interception":
                 self.field_dict = {"address": None}
             case "Dos":
                 self.field_dict = {"address": None}
             case "Rainbow Table":
-                self.field_dict = {"address": None, "user_name": None, "hashed_password": None}
+                self.field_dict = {"address": None, "user name": None, "hashed password": None}
             case _:
                 print("error")
         self.passed = None
@@ -203,13 +205,14 @@ class TargetListItem(QWidget):
         self.active_checkbox = QCheckBox()
         self.label = QLabel(self.data.get_address())
         delete_button = QPushButton("X")
+        delete_button.setFixedWidth(50)
 
         delete_button.clicked.connect(self.delete_item)
         self.active_checkbox.stateChanged.connect(self.checkbox_state_changed)
 
-        layout.addWidget(self.active_checkbox)
-        layout.addWidget(self.label)
-        layout.addWidget(delete_button)
+        layout.addWidget(self.active_checkbox, alignment=Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.label, alignment=Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(delete_button, alignment=Qt.AlignmentFlag.AlignRight)
 
         self.setLayout(layout)
 
@@ -257,10 +260,41 @@ class NewTarget(QWidget):
             self.field_dict[label].clear()
 
     def validate(self):
-        return True
+        valid_list = []
+        for key in self.field_dict.keys():
+            valid = True
+            field: QLineEdit = self.field_dict[key]
+            text = field.text()
+            field.setPlaceholderText("")
+            match key:
+                case "address" | "view image":
+                    # validate with requests
+                    """
+                    try:
+                        response = requests.get(text)
+                        if response.status_code != 200:
+                            return False
+                    except Exception:
+                        return False
+                    """
+                    # validate with validators
+                    valid = validators.ipv4(text) or validators.url(text)
+
+                case "user name":
+                    valid = validators.email(text)
+
+                case "hashed password":
+                    pass  # do we need to validate this?
+            valid_list.append(valid)
+            if not valid:
+                field.clear()
+                field.setPlaceholderText("Invalid input")
+
+        return all(valid_list)
 
     def click(self):
         if not self.validate():
+            print("fault")
             return
         new_data = Data(self.script)
         for label in self.field_dict.keys():
@@ -281,4 +315,5 @@ class NewTarget(QWidget):
 app = QApplication(sys.argv)
 AIO = AIOTab()
 AIO.show()
+AIO.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 sys.exit(app.exec())
