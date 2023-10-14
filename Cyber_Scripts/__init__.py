@@ -1,5 +1,5 @@
 # import nmap3
-import nmap
+# import nmap
 from scapy.all import *
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -22,7 +22,6 @@ source_port = 80
 # port of the targeted IP
 target_port = 80
 
-
 """
 # functions
 def get_open_ports_nmap(ip: str, amount: int = 50):
@@ -37,8 +36,8 @@ def get_open_ports_nmap(ip: str, amount: int = 50):
     return open_ports
 """
 
-
-def port_discovery(address = "127.0.0.1"):
+"""
+def port_discovery(address="127.0.0.1"):
     start = time.time()
     nmScan = nmap.PortScanner()
     nmScan.scan(address, "1-65535")
@@ -54,8 +53,11 @@ def port_discovery(address = "127.0.0.1"):
             for port in allports:
                 print('port : %s\tstate : %s' % (port, nmScan[host][proto][port]['state']))
             end = time.time()
-            print((end-start)/60)
+            print((end - start) / 60)
             return allports
+
+"""
+
 
 # Easier to change the browser here in case of an error
 def create_driver(page_url):
@@ -63,6 +65,8 @@ def create_driver(page_url):
     driver.get(page_url)
     time.sleep(1)  # wait for the page to load
     return driver
+
+
 def enter_login_input(login_page_url, user_name, password):
     driver = create_driver(login_page_url)
 
@@ -113,5 +117,3 @@ def enter_login_input(login_page_url, user_name, password):
         driver.quit()
 
     # return driver, input_elements[0], input_elements[1], button_elements[-1]
-
-
