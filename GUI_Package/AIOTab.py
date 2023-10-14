@@ -256,7 +256,9 @@ class NewTarget(QWidget):
 
     def clear_text_fields(self):
         for label in self.field_dict.keys():
-            self.field_dict[label].clear()
+            field: QLineEdit = self.field_dict[label]
+            field.clear()
+            field.setPlaceholderText("")
 
     def validate(self):
         valid_list = []
@@ -280,10 +282,10 @@ class NewTarget(QWidget):
                     valid = validators.ipv4(text) or validators.url(text)
 
                 case "user name":
-                    valid = validators.email(text)
+                    valid = text != ""
 
                 case "hashed password":
-                    pass  # do we need to validate this?
+                    valid = text != ""
             valid_list.append(valid)
             if not valid:
                 field.clear()
@@ -311,8 +313,10 @@ class NewTarget(QWidget):
         self.parent_list.parent().item_added(item)
 
 
+"""
 app = QApplication(sys.argv)
 AIO = AIOTab()
 AIO.show()
 AIO.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 sys.exit(app.exec())
+"""

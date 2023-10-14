@@ -1,6 +1,7 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel, QTextEdit, QPushButton
 
+from GUI_Package.AIOTab import *
 from GUI_Package.IPAddressesTab import IPAddressTab
 from GUI_Package.CyberScriptsTab import CyberScriptsTab
 from GUI_Package.OutputLogsTab import OutputLogsTab
@@ -22,24 +23,21 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
 
         # Add tabs to the tab widget
-        self.tabs.addTab(IPAddressTab(self.cyber_container), "Addresses")
-        self.tabs.addTab(CyberScriptsTab(self.cyber_container), "Cyber Scripts")
-        self.tabs.addTab(QWidget(), "Required Data")
-        self.tabs.addTab(OutputLogsTab(self.cyber_container.output), "Output Logs")
-        self.tabs.addTab(QWidget(), "Blank 2")
+        self.tabs.addTab(AIOTab(), "Input")
+        self.tabs.addTab(QWidget(), "Output")
 
         # create top label
         self.message_of_the_day = QLabel("Testing testing one two three")
 
         # create begin button
-        self.begin_button = QPushButton("Begin")
+        # self.begin_button = QPushButton("Begin")
         # self.begin_button.setFixedWidth(200)
 
         # Create a vertical layout for the tab widget
         self.window_vbox = QVBoxLayout()
         self.window_vbox.addWidget(self.message_of_the_day, alignment=Qt.AlignmentFlag.AlignCenter)
         self.window_vbox.addWidget(self.tabs)
-        self.window_vbox.addWidget(self.begin_button)  # , alignment=Qt.AlignmentFlag.AlignRight)
+        # self.window_vbox.addWidget(self.begin_button)  # , alignment=Qt.AlignmentFlag.AlignRight)
 
 
         # Set the main window layout to the horizontal layout
