@@ -16,7 +16,7 @@ def get_script_module(script_name):
 def execute_script(script_name, args):
     # TODO change execute structure to have "*args"
     module = get_script_module(script_name)
-    module.execute(*args)
+    return module.execute(*args)
 
 
 class AIOTab(QWidget):
@@ -162,8 +162,10 @@ class TabUI(QWidget):
                 widget: TargetListItem = qlist.itemWidget(item)
                 data: Data = widget.data
                 if widget.active_checkbox.isChecked():
+                    if script == "Dos":
+                        pass
                     start = time.time()
-                    execute_script(script, widget.data_to_tuple())
+                    data.passed = execute_script(script, widget.data_to_tuple())
                     finish = time.time()
                     data.time = finish - start
 
