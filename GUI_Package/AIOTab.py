@@ -160,8 +160,12 @@ class TabUI(QWidget):
             for i in range(qlist.count()):
                 item = qlist.item(i)
                 widget: TargetListItem = qlist.itemWidget(item)
+                data: Data = widget.data
                 if widget.active_checkbox.isChecked():
+                    start = time.time()
                     execute_script(script, widget.data_to_tuple())
+                    finish = time.time()
+                    data.time = finish - start
 
     def item_added(self, item: QListWidgetItem):
         widget = self.existing_targets_widget.itemWidget(item)
