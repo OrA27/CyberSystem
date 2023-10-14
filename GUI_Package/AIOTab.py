@@ -7,7 +7,16 @@ from Cyber_Scripts import *
 import validators
 
 
-# from Main.cyber_attacks_container import CyberContainer
+def get_script_module(script_name):
+    full_name = f"Cyber_Scripts.{script_name}"
+    module = importlib.import_module(full_name)
+    return module
+
+
+def execute_script(script_name, args):
+    # TODO change execute structure to have "*args"
+    module = get_script_module(script_name)
+    module.execute(*args)
 
 
 class AIOTab(QWidget):
@@ -146,7 +155,13 @@ class TabUI(QWidget):
             widget.active_checkbox.setChecked(False)
 
     def begin(self):
-        pass
+        for script in self.script_names:
+            qlist: QListWidget = self.existing_targets[script]
+            for i in range(qlist.count()):
+                item = qlist.item(i)
+                widget: TargetListItem = qlist.itemWidget(item)
+                if widget.active_checkbox.isChecked():
+                    execute_script(script, widget.data_to_tuple())
 
     def item_added(self, item: QListWidgetItem):
         widget = self.existing_targets_widget.itemWidget(item)
@@ -222,6 +237,9 @@ class TargetListItem(QWidget):
         self.active_checkbox.setChecked(False)
         self.parent_list.takeItem(self.parent_list.row(self.parent_item))
         self.deleteLater()
+
+    def data_to_tuple(self):
+        return tuple(self.data.field_dict.values())
 
 
 class NewTarget(QWidget):
