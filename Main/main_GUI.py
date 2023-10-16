@@ -7,6 +7,8 @@ from GUI_Package.CyberScriptsTab import CyberScriptsTab
 from GUI_Package.OutputLogsTab import OutputLogsTab
 
 import sys
+
+from GUI_Package.OutputTab import OutputTab
 from cyber_attacks_container import CyberContainer
 
 
@@ -25,7 +27,7 @@ class MainWindow(QMainWindow):
         # Create tabs
         self.input = AIOTab(self)
         self.logs = QWidget()
-        self.output = QWidget()
+        self.output = OutputTab(self)
 
         # Add tabs to the tab widget
         self.tabs.addTab(self.input, "Input")
