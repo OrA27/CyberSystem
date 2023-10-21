@@ -165,7 +165,7 @@ class TabUI(QWidget):
 
     def begin(self):
         try:
-            # self.container.output.clear()
+            self.container.output.clear()
             self.container.logs.clear()
             print(self.container.findChildren(QTextEdit))
             for script in self.script_names:
@@ -220,7 +220,7 @@ class TabUI(QWidget):
             avg_time /= success_rate
             success_rate /= len(data_list)
             results[script] = (success_rate, avg_time)
-        # self.container.output.analyze()  # enable later
+        self.container.output.analyze()  # enable later
 
 
 class Data:

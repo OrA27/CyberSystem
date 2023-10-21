@@ -54,3 +54,10 @@ class OutputTab(QWidget):
                 ax.annotate(f'Average successful execution time: {avg_time}')
                 canvas = FigureCanvas(fig)
                 self.layout.addWidget(canvas, row, col)
+
+    def clear(self):
+        # Remove all widgets from the layout
+        for i in reversed(range(self.layout.count())):
+            widget = self.layout.itemAt(i).widget()
+            if widget is not None:
+                widget.deleteLater()
