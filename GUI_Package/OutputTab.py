@@ -32,6 +32,7 @@ class OutputTab(QWidget):
             for col in range(self.cols):
                 try:
                     name = self.script_names[i]  # name of current script results
+                    i += 1
                     rate, avg_time = results[name]  # results
                 except:
                     continue
@@ -51,7 +52,6 @@ class OutputTab(QWidget):
                 canvas.axes.set_title(name)
                 canvas.fig.text(0.5, 0.05, f'Average successful execution time: {avg_time}', ha='center')
                 self.layout.addWidget(canvas, row, col)
-                i += 1
 
     def clear(self):
         # Remove all widgets from the layout
