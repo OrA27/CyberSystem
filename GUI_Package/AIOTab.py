@@ -170,9 +170,9 @@ class TabUI(QWidget):
             print(self.container.findChildren(QTextEdit))
             for script in self.script_names:
                 qlist: QListWidget = self.existing_targets[script]
+                self.raw_data[script] = []
                 if qlist.count() == 0:
                     continue
-                self.raw_data[script] = []
                 for i in range(2, qlist.count()):
                     item = qlist.item(i)
                     widget: TargetListItem = qlist.itemWidget(item)
@@ -207,10 +207,12 @@ class TabUI(QWidget):
     def export_data(self):
         results = {}
         for script in self.script_names:
+            data_list: list = self.raw_data[script]
+            if len(data_list) == 0:
+                continue
             # (success rate, avg success time)
             success_rate = 0
             avg_time = 0
-            data_list: list = self.raw_data[script]
             for data in data_list:
                 if data.passed:
                     success_rate += 1
