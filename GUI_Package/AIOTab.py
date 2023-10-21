@@ -217,7 +217,7 @@ class TabUI(QWidget):
             avg_time /= success_rate
             success_rate /= len(data_list)
             results[script] = (success_rate, avg_time)
-        self.container.output.analyze()  # enable later
+        self.container.output.analyze(results)  # enable later
 
 
 class Data:
