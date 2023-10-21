@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import threading
 from Cyber_Scripts import *
+from PyQt6.QtWidgets import QTextEdit
 
 """
 def send_data(login_page_url):
@@ -48,7 +49,10 @@ def packet_filter(packet, your_ip, server_ip):
         b'POST' in packet["Raw"].load  # Check if "POST" is in the packet content
     )
 
-def execute(domain, login_page_url):
+def execute(domain, login_page_url, output: QTextEdit):
+    output.append('Data Interception Check')
+    output.append(f'Domain: {domain}')
+    output.append(f'Login page url: {login_page_url}')
     values_found = 0
     response = None
     while not response:
@@ -87,9 +91,11 @@ def execute(domain, login_page_url):
             break
     if values_found == 2:
         print("attack succeeded")
+        output.append("The Site is vulnerable to the attack\n\n")
         return True
     else:
         print("attack failed")
+        output.append("The site is not vulnerable to the attack\n\n")
         return False
 
 execute(domain = "seatassist.byethost32.com", login_page_url='http://seatassist.byethost32.com/pages/index.php')

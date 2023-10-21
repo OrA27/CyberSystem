@@ -7,7 +7,7 @@ from Cyber_Scripts import *
 import validators
 
 from Main.main_GUI import MainWindow
-
+from GUI_Package import LogsTab
 
 def get_script_module(script_name):
     full_name = f"Cyber_Scripts.{script_name}"
@@ -164,6 +164,7 @@ class TabUI(QWidget):
             # enable these later
             # self.container.output.clear()
             # self.container.logs.clear()
+            print(self.container.findChildren(QTextEdit))
             for script in self.script_names:
                 qlist: QListWidget = self.existing_targets[script]
                 self.raw_data[script] = []

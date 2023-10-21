@@ -108,6 +108,9 @@ def enter_login_input(login_page_url, user_name, password):
     # lookup failed -> abort
     try:
         new_url = driver.current_url
+        new_url = new_url.split("?")[0]
+        print(new_url)
+        print(login_page_url)
         passed = login_page_url != new_url
         return passed
     except:

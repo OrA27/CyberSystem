@@ -1,5 +1,7 @@
 import rainbowtables as rt
 import time
+
+from PyQt6.QtWidgets import QTextEdit
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from Cyber_Scripts import *
@@ -92,7 +94,11 @@ def hash_lookup(hashed):
         return False
 
 
-def execute(login_page_url, user_name, hashed, table="rainbow_table"):
+def execute(login_page_url, user_name, hashed, output: QTextEdit):
+    output.append('Rainbow Table Check')
+    output.append(f'Login page url: {login_page_url}')
+    output.append(f'User name: {user_name}')
+    output.append(f'Hashed password: {hashed}')
     # table creation should happen prior to execution ??
 
     # extract relevant username and hashed password from db or from GUI
@@ -109,8 +115,10 @@ def execute(login_page_url, user_name, hashed, table="rainbow_table"):
     passed = enter_login_input(login_page_url, user_name, fake_password)
     if passed:
         print("rainbow table attack succeed")
+        output.append("The Site is vulnerable to the attack\n\n")
     else:
         print("rainbow table attack failed")
+        output.append("The Site is not vulnerable to the attack\n\n")
     return passed
 
 

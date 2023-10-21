@@ -3,9 +3,13 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import os
 from Cyber_Scripts import *
+from PyQt6.QtWidgets import QTextEdit
 
 
-def execute(upload_page_url, view_page_url):
+def execute(upload_page_url, view_page_url, output: QTextEdit):
+    output.append("Remote Control Execution Check")
+    output.append("Upload page url: " + upload_page_url)
+    output.append("View page url: " + view_page_url)
     """
     driver = webdriver.Chrome()
 
@@ -42,10 +46,14 @@ def execute(upload_page_url, view_page_url):
     time.sleep(1)
 
     page_src = driver.page_source
-    if "injection.php" in page_src:
+    passed = "injection.php" in page_src
+    if passed:
         print("The attack succeeded")
+        output.append("The Site is vulnerable to the attack\n\n")
     else:
         print("The attack failed")
+        output.append("The Site is not vulnerable to the attack\n\n")
+    return passed
 
 
 execute(upload_page_url='http://localhost/site/upload.html', view_page_url='http://localhost/site/view_image.php')
