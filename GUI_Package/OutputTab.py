@@ -13,7 +13,7 @@ class OutputTab(QWidget):
         self.rows, self.cols = self.get_rows_cols()
 
         # layout
-        self.layout = QGridLayout()
+        self.layout = QGridLayout(self)
         # either add message for no output or disable the tab until begin function has finished
 
     def get_rows_cols(self):
@@ -24,7 +24,7 @@ class OutputTab(QWidget):
             cols += 1
         return rows, cols
 
-    def analyze(self, results: dict):
+    def analyze(self, results):
         # results look like this -> result[script] = (success rate, average time)
         # currently passed means the attack failed
         i = 0
@@ -39,18 +39,19 @@ class OutputTab(QWidget):
                 rate *= 100  # change from fraction to percentage
 
                 # pie chart attributes
-                canvas = Canvas(self)
-                labels = ["Fail", "Passed"]
+                fig, ax = plt.subplots()
+                labels = ["Vulnerable", "resistant"]
                 sizes = [rate, 100 - rate]
                 colors = ['red', 'green']  # red for attack success
                 explode = [0.1, 0]
 
                 # create pie chart
-                canvas.axes.pie(sizes, explode=explode, labels=labels, colors=colors,
-                                autopct='%1.1f%%', shadow=True, startangle=90)
+                ax.pie(sizes, explode=explode, labels=labels, colors=colors,
+                       autopct='%1.1f%%', shadow=False, startangle=0)
                 # title and annotation of the plot
-                canvas.axes.set_title(name)
-                canvas.fig.text(0.5, 0.05, f'Average successful execution time: {avg_time}', ha='center')
+                ax.set_title(name)
+                fig.text(0.5, 0.03, f'Average successful execution time: {avg_time}', ha='center')
+                canvas = FigureCanvasQTAgg(fig)
                 self.layout.addWidget(canvas, row, col)
 
     def clear(self):
@@ -59,10 +60,3 @@ class OutputTab(QWidget):
             widget = self.layout.itemAt(i).widget()
             if widget is not None:
                 widget.deleteLater()
-
-
-class Canvas(FigureCanvasQTAgg):
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        self.fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = self.fig.add_subplot(111)
-        super(Canvas, self).__init__(self.fig)
