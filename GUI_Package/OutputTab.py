@@ -1,8 +1,10 @@
 import math
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from matplotlib.figure import Figure
 from PyQt6.QtWidgets import QWidget, QGridLayout
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
+import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.use('Qt5Agg')
 
 
 class OutputTab(QWidget):
