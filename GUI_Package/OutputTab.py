@@ -1,6 +1,7 @@
 import math
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.figure import Figure
 from PyQt6.QtWidgets import QWidget, QGridLayout
 
 
@@ -37,20 +38,18 @@ class OutputTab(QWidget):
                 rate *= 100  # change from fraction to percentage
 
                 # pie chart attributes
-                fig, ax = plt.subplots()
+                canvas = Canvas(self)
                 labels = ["Fail", "Passed"]
                 sizes = [rate, 100 - rate]
                 colors = ['red', 'green']  # red for attack success
                 explode = [0.1, 0]
 
                 # create pie chart
-                ax.pie(sizes, explode=explode, labels=labels, colors=colors,
-                       autopct='%1.1f%%', shadow=True, startangle=90)
-
+                canvas.axes.pie(sizes, explode=explode, labels=labels, colors=colors,
+                                autopct='%1.1f%%', shadow=True, startangle=90)
                 # title and annotation of the plot
-                ax.set_title(name)
-                fig.text(0.5, 0.05, f'Average successful execution time: {avg_time}', ha='center')
-                canvas = FigureCanvas(fig)
+                canvas.axes.set_title(name)
+                canvas.fig.text(0.5, 0.05, f'Average successful execution time: {avg_time}', ha='center')
                 self.layout.addWidget(canvas, row, col)
                 i += 1
 
@@ -60,3 +59,10 @@ class OutputTab(QWidget):
             widget = self.layout.itemAt(i).widget()
             if widget is not None:
                 widget.deleteLater()
+
+
+class Canvas(FigureCanvasQTAgg):
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        super(Canvas, self).__init__(fig)
