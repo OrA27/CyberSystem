@@ -1,3 +1,5 @@
+import requests
+
 from GUI_Package import *
 from PyQt6.QtCore import Qt, QItemSelectionModel, pyqtSignal
 from PyQt6.QtGui import QFont, QTransform, QIcon
@@ -9,15 +11,16 @@ import validators
 from Main.main_GUI import MainWindow
 from GUI_Package import LogsTab
 
+
 def get_script_module(script_name):
     full_name = f"Cyber_Scripts.{script_name}"
     module = importlib.import_module(full_name)
     return module
 
 
-def execute_script(script_name, arg):
+def execute_script(script_name, arg, output):
     module = get_script_module(script_name)
-    return module.execute(*arg)
+    return module.execute(*arg, output=output)
 
 
 class AIOTab(QWidget):
@@ -52,6 +55,7 @@ class TabUI(QWidget):
         self.active_script = self.script_names[0]
         self.raw_data = {}  # key: script ;; value: list of data objects
         self.container: MainWindow = self.parent().parent()
+        self.log: QTextEdit = self.container.logs.text_field
 
         # create main layout
         self.layout = QHBoxLayout(self)  # main layout
@@ -176,7 +180,7 @@ class TabUI(QWidget):
                         if script == "Dos":
                             pass
                         start = time.time()
-                        data.passed = execute_script(script, widget.data_to_tuple())
+                        data.passed = execute_script(script, widget.data_to_tuple(), output=self.log)
                         finish = time.time()
                         data.time = finish - start
 
@@ -327,16 +331,16 @@ class NewTarget(QWidget):
             match key:
                 case "address" | "view image":
                     # validate with requests
-                    """
                     try:
                         response = requests.get(text)
                         if response.status_code != 200:
-                            return False
-                    except Exception:
-                        return False
-                    """
-                    # validate with validators
-                    valid = validators.ipv4(text) or validators.url(text)
+                            valid = False
+                    except:
+                        # validate with validators
+                        print("No response from address")
+                        valid = validators.ipv4(text) or validators.url(text)
+                    finally:
+                        valid = False
 
                 case "user name":
                     valid = text != ""
@@ -368,12 +372,3 @@ class NewTarget(QWidget):
         self.parent_list.addItem(item)
         self.parent_list.setItemWidget(item, widget)
         self.parent_list.parent().item_added(item)
-
-
-"""
-app = QApplication(sys.argv)
-AIO = AIOTab()
-AIO.show()
-AIO.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-sys.exit(app.exec())
-"""

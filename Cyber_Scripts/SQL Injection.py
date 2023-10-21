@@ -52,7 +52,7 @@ def try_sqlinj(address, user_name, password):
 """
 
 
-def execute(login_page_url, output: QTextEdit, user_name="a@a.a"):
+def execute(login_page_url, user_name, output: QTextEdit):
     output.append("SQL Injection Check")
     output.append("Login page url: " + login_page_url)
     output.append("User name: " + user_name)

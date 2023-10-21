@@ -3,7 +3,6 @@ from PyQt6.QtGui import QFont
 
 from GUI_Package.IPAddressesTab import IPAddressTab
 from GUI_Package.CyberScriptsTab import CyberScriptsTab
-from GUI_Package.OutputLogsTab import OutputLogsTab
 
 
 # TODO 30/04/2023 Or: add background colors to tabs
@@ -73,7 +72,6 @@ if __name__ == '__main__':
     w.tabBar().setFont(font)
     w.addTab(IPAddressTab(), "IP Addresses")
     w.addTab(CyberScriptsTab(), "Cyber Scripts")
-    w.addTab(OutputLogsTab(), "Output Logs")
 
     w.show()
 

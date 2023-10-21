@@ -1,16 +1,10 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel, QTextEdit, QPushButton
-
+from PyQt6.QtWidgets import QTabWidget
 from GUI_Package.AIOTab import *
-from GUI_Package.IPAddressesTab import IPAddressTab
-from GUI_Package.CyberScriptsTab import CyberScriptsTab
-from GUI_Package.OutputLogsTab import OutputLogsTab
-
-import sys
-
 from GUI_Package.OutputTab import OutputTab
 from cyber_attacks_container import CyberContainer
 from GUI_Package.LogsTab import LogsTab
+import sys
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -25,8 +19,8 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
 
         # Create tabs
-        self.input = AIOTab(self)
         self.logs = LogsTab(self)
+        self.input = AIOTab(self)
         self.output = OutputTab(self)
 
         # Add tabs to the tab widget
