@@ -31,8 +31,10 @@ class OutputTab(QWidget):
             for col in range(self.cols):
                 name = self.script_names(i)  # name of current script results
                 i += 1
-
-                rate, avg_time = results[name]  # results
+                try:
+                    rate, avg_time = results[name]  # results
+                except:
+                    continue
                 rate *= 100  # change from fraction to percentage
 
                 # pie chart attributes
