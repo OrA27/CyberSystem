@@ -9,8 +9,6 @@ import sys
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.cyber_container = CyberContainer("Cyber_Scripts")
-
         # Create the main window
         self.setWindowTitle("Cyber Security System")
         # self.setGeometry(100, 100, 800, 600)

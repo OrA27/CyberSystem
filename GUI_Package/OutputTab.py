@@ -1,16 +1,13 @@
 import math
-import sys
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from PyQt6.QtWidgets import QVBoxLayout, QWidget, QGridLayout, QLabel
-
-from Main.main_GUI import MainWindow
+from PyQt6.QtWidgets import QWidget, QGridLayout
 
 
 class OutputTab(QWidget):
     def __init__(self, parent):
         super().__init__(parent=parent)
-        self.parent: MainWindow = self.parent()
+        self.parent = self.parent()
         self.script_names = self.parent.input.ui.script_names
         self.rows, self.cols = self.get_rows_cols()
 

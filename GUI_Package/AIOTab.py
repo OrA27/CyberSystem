@@ -1,5 +1,4 @@
 import requests
-
 from GUI_Package import *
 from PyQt6.QtCore import Qt, QItemSelectionModel, pyqtSignal
 from PyQt6.QtGui import QFont, QTransform, QIcon
@@ -7,9 +6,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit
     QCheckBox
 from Cyber_Scripts import *
 import validators
-
 from Main.main_GUI import MainWindow
-from GUI_Package import LogsTab
 
 
 def get_script_module(script_name):
