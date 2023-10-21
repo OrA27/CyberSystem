@@ -13,6 +13,9 @@ class LogsTab(QWidget):
         self.layout.addWidget(self.text_field)
         print(self.text_field)
 
+    def clear(self):
+        self.text_field.clear()
+
 """
     def ex(self):
         execute(login_page_url="http://localhost/site/login.php", user_name="a@a.a", output=self.text_field)

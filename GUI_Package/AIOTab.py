@@ -165,12 +165,13 @@ class TabUI(QWidget):
 
     def begin(self):
         try:
-            # enable these later
             # self.container.output.clear()
-            # self.container.logs.clear()
+            self.container.logs.clear()
             print(self.container.findChildren(QTextEdit))
             for script in self.script_names:
                 qlist: QListWidget = self.existing_targets[script]
+                if qlist.count() == 0:
+                    continue
                 self.raw_data[script] = []
                 for i in range(2, qlist.count()):
                     item = qlist.item(i)
@@ -339,8 +340,6 @@ class NewTarget(QWidget):
                         # validate with validators
                         print("No response from address")
                         valid = validators.ipv4(text) or validators.url(text)
-                    finally:
-                        valid = False
 
                 case "user name":
                     valid = text != ""
