@@ -1,6 +1,6 @@
 import requests
 from GUI_Package import *
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal, QThread
 from PyQt6.QtWidgets import *
 from Cyber_Scripts import *
 import validators
@@ -11,7 +11,7 @@ import threading
 class AIOTab(QWidget):
     def __init__(self, parent):
         super().__init__(parent=parent)
-        self.thread: Thread = Thread(target=self.begin)
+        self.thread: QThread = QThread()
 
         # create layout
         self.layout = QVBoxLayout(self)
@@ -28,14 +28,16 @@ class AIOTab(QWidget):
         self.setLayout(self.layout)
 
     def begin_thread(self):
-        if not self.thread.is_alive():
-            self.thread = Thread(target=self.begin)
-            self.thread.run()
+        if not self.thread.isRunning():
+            self.begin_button.setEnabled(False)
+            self.thread = QThread()
+            self.thread.started.connect(self.begin)
+            self.thread.start()
+            self.begin_button.setEnabled(True)
 
     def begin(self):
-        self.begin_button.setEnabled(False)
         self.ui.begin()
-        self.begin_button.setEnabled(True)
+        self.thread.exit()
 
 
 class TabUI(QWidget):
@@ -155,10 +157,10 @@ class TabUI(QWidget):
             widget.active_checkbox.setChecked(False)
 
     def begin(self):
+        self.container.tabs.setCurrentWidget(self.container.logs)
         try:
             self.container.output.clear()
             self.container.logs.clear()
-            print(self.container.findChildren(QTextEdit))
             for script in self.script_names:
                 qlist: QListWidget = self.existing_targets[script]
                 self.raw_data[script] = []
