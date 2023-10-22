@@ -1,8 +1,7 @@
 import requests
 from GUI_Package import *
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle, QListWidgetItem, \
-    QCheckBox
+from PyQt6.QtWidgets import *
 from Cyber_Scripts import *
 import validators
 from Main.main_GUI import MainWindow
