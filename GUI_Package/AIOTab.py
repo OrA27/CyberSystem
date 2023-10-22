@@ -23,7 +23,7 @@ def execute_script(script_name, arg, output):
 class AIOTab(QWidget):
     def __init__(self, parent):
         super().__init__(parent=parent)
-        self.thread: Thread = Thread(target=self.begin_thread)
+        self.thread: Thread = Thread(target=self.begin)
 
         # create layout
         self.layout = QVBoxLayout(self)
@@ -41,7 +41,7 @@ class AIOTab(QWidget):
 
     def begin_thread(self):
         if not self.thread.is_alive():
-            self.thread = Thread(target=self.begin_thread)
+            self.thread = Thread(target=self.begin)
             self.thread.run()
 
     def begin(self):
