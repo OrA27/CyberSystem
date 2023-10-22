@@ -9,7 +9,7 @@ matplotlib.use('Qt5Agg')
 
 # TODO threads for scripts
 # TODO DOS
-# TODO
+# TODO serialization of data
 
 
 class OutputTab(QWidget):

@@ -9,17 +9,6 @@ from Main.main_GUI import MainWindow
 import threading
 
 
-def get_script_module(script_name):
-    full_name = f"Cyber_Scripts.{script_name}"
-    module = importlib.import_module(full_name)
-    return module
-
-
-def execute_script(script_name, arg, output):
-    module = get_script_module(script_name)
-    return module.execute(*arg, output=output)
-
-
 class AIOTab(QWidget):
     def __init__(self, parent):
         super().__init__(parent=parent)
@@ -201,7 +190,7 @@ class TabUI(QWidget):
         widget.active_checkbox.setCheckState(Qt.CheckState.Checked)
 
     def item_changed(self, checked, label):
-        active_list = self.active_targets[self.active_script]
+        active_list: list = self.active_targets[self.active_script]
         if checked and label not in active_list:
             active_list.append(label)
         else:
