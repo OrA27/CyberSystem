@@ -1,12 +1,12 @@
 import requests
 from GUI_Package import *
-from PyQt6.QtCore import Qt, QItemSelectionModel, pyqtSignal
-from PyQt6.QtGui import QFont, QTransform, QIcon
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle, QListWidgetItem, \
     QCheckBox
 from Cyber_Scripts import *
 import validators
 from Main.main_GUI import MainWindow
+import threading
 
 
 def get_script_module(script_name):
@@ -23,6 +23,7 @@ def execute_script(script_name, arg, output):
 class AIOTab(QWidget):
     def __init__(self, parent):
         super().__init__(parent=parent)
+        self.thread: Thread = Thread(target=self.begin_thread)
 
         # create layout
         self.layout = QVBoxLayout(self)
@@ -31,12 +32,17 @@ class AIOTab(QWidget):
         self.ui = TabUI(self)  # self.cyber_container)
         # create button
         self.begin_button = QPushButton("Begin")
-        self.begin_button.clicked.connect(self.begin)
+        self.begin_button.clicked.connect(self.begin_thread)
 
         # add QWidgets
         self.layout.addWidget(self.ui, alignment=Qt.AlignmentFlag.AlignLeft)
         self.layout.addWidget(self.begin_button, alignment=Qt.AlignmentFlag.AlignRight)
         self.setLayout(self.layout)
+
+    def begin_thread(self):
+        if not self.thread.is_alive():
+            self.thread = Thread(target=self.begin_thread)
+            self.thread.run()
 
     def begin(self):
         self.begin_button.setEnabled(False)

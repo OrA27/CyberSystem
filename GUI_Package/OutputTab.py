@@ -7,7 +7,10 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 
 
-# TODO change format for average execution time
+# TODO threads for scripts
+# TODO DOS
+# TODO
+
 
 class OutputTab(QWidget):
     def __init__(self, parent):
