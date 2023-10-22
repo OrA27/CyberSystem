@@ -11,13 +11,18 @@ import threading
 class AIOTab(QWidget):
     def __init__(self, parent):
         super().__init__(parent=parent)
+        self.parent = parent
+
         self.thread: QThread = QThread()
+        self.progress_thread = QThread()
 
         # create layout
         self.layout = QVBoxLayout(self)
 
         # create UI box
-        self.ui = TabUI(self)  # self.cyber_container)
+        self.ui = TabUI(self)
+        self.progress_window = ProgressWindow(self)
+        self.progress_window.finished.connect(self.done)
         # create button
         self.begin_button = QPushButton("Begin")
         self.begin_button.clicked.connect(self.begin_thread)
@@ -31,13 +36,27 @@ class AIOTab(QWidget):
         if not self.thread.isRunning():
             self.begin_button.setEnabled(False)
             self.thread = QThread()
+            self.progress_thread = QThread()
+
             self.thread.started.connect(self.begin)
+            self.progress_thread.started.connect(self.progress)
+
+            self.progress_thread.start()
             self.thread.start()
-            self.begin_button.setEnabled(True)
+
+    def progress(self):
+        self.parent.hide()
+        self.progress_window.show()
 
     def begin(self):
         self.ui.begin()
         self.thread.exit()
+        self.begin_button.setEnabled(True)
+
+    def done(self):
+        self.progress_window.hide()
+        self.parent.show()
+        self.progress_thread.exit()
 
 
 class TabUI(QWidget):
@@ -47,7 +66,7 @@ class TabUI(QWidget):
         self.script_names = list_package_modules("Cyber_Scripts")
         self.active_script = self.script_names[0]
         self.raw_data = {}  # key: script ;; value: list of data objects
-        self.container: MainWindow = self.parent().parent()
+        self.container: MainWindow = self.parent().parent
         self.log: QTextEdit = self.container.logs.text_field
 
         # create main layout
@@ -156,9 +175,19 @@ class TabUI(QWidget):
             widget: TargetListItem = targets.itemWidget(item)
             widget.active_checkbox.setChecked(False)
 
+    def count_attacks(self):
+        attack_count = 0
+        for script in self.script_names:
+            attack_count += len(self.active_targets[script])
+
+        return attack_count
+
     def begin(self):
-        self.container.tabs.setCurrentWidget(self.container.logs)
         try:
+            count = 1
+            total = max(self.count_attacks(), 1)
+            progress_bar: ProgressWindow = self.parent().progress_window
+
             self.container.output.clear()
             self.container.logs.clear()
             for script in self.script_names:
@@ -180,6 +209,10 @@ class TabUI(QWidget):
                         self.log.append(f'attack time: {data.time:.2f}\n\n')
 
                         self.raw_data[script].append(data)
+
+                    percentage_done = count / total * 100
+                    progress_bar.update_progress_bar(percentage_done)
+
         except:
             return
 
@@ -215,6 +248,30 @@ class TabUI(QWidget):
             success_rate /= len(data_list)
             results[script] = (success_rate, avg_time)
         self.container.output.analyze(results)  # enable later
+
+
+class ProgressWindow(QMainWindow):
+    finished = pyqtSignal()
+
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        self.layout = QVBoxLayout()
+        self.progress_bar = QProgressBar()
+        self.layout.addWidget(self.progress_bar)
+        self.main_widget = QWidget(self)
+        self.main_widget.setLayout(self.layout)
+        self.setCentralWidget(self.main_widget)
+
+    def update_progress_bar(self, value):
+        self.progress_bar.setValue(value)
+
+    def progress_finished(self):
+        self.progress_bar.setValue(0)
+        self.finished.emit()
+
+
+
 
 
 class Data:
