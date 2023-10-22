@@ -181,6 +181,7 @@ class TabUI(QWidget):
                         data.passed = execute_script(script, widget.data_to_tuple(), output=self.log)
                         finish = time.time()
                         data.time = finish - start
+                        self.log.append(f'attack time: {data.time:.2f}\n\n')
 
                         self.raw_data[script].append(data)
         except:
