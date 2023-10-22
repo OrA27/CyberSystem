@@ -54,7 +54,7 @@ class OutputTab(QWidget):
                        autopct='%1.1f%%', shadow=False, startangle=90)
                 # title and annotation of the plot
                 ax.set_title(name)
-                fig.text(0.5, 0.03, f'Average successful execution time: {avg_time}', ha='center')
+                fig.text(0.5, 0.03, f'Average successful execution time: {avg_time:.2f}', ha='center')
                 canvas = FigureCanvasQTAgg(fig)
                 self.layout.addWidget(canvas, row, col)
 
