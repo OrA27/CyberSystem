@@ -349,6 +349,7 @@ class TabUI(QWidget):
             self.worker.logged.connect(self.write_log)
             self.worker.progressed.connect(self.percentage_done)
             self.worker.grid_sized.connect(self.container.output.set_grid)
+            self.worker.analyzed.connect(self.container.output.add_canvas)
             self.worker.finished.connect(self.done)
             self.worker.finished.connect(self.thread.quit)
             self.worker.finished.connect(self.worker.deleteLater)
