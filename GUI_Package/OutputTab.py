@@ -14,7 +14,7 @@ class OutputTab(QWidget):
         super().__init__(parent=parent)
         self.parent = self.parent()
         self.script_names = self.parent.input.ui.script_names
-        self.rows, self.cols = self.get_rows_cols()
+        self.rows, self.cols = 0, 0
 
         # layout
         self.layout = QGridLayout(self)
@@ -27,6 +27,10 @@ class OutputTab(QWidget):
         if scripts_amount > nearest_square:
             cols += 1
         return rows, cols
+
+    def set_grid(self, rows, cols):
+        self.rows = rows
+        self.cols = cols
 
     def analyze(self, results):
         # results look like this -> result[script] = (success rate, average time)
@@ -57,6 +61,9 @@ class OutputTab(QWidget):
                 fig.text(0.5, 0.03, f'Average successful execution time: {avg_time:.2f}', ha='center')
                 canvas = FigureCanvasQTAgg(fig)
                 self.layout.addWidget(canvas, row, col)
+
+    def add_canvas(self, canvas, row, col):
+        self.layout.addWidget(canvas, row, col)
 
     def clear(self):
         # Remove all widgets from the layout

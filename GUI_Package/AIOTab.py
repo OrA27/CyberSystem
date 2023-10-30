@@ -1,4 +1,6 @@
 import requests
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
+
 from GUI_Package import *
 from PyQt6.QtCore import Qt, QItemSelectionModel, pyqtSignal, QObject, QThread
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle, QListWidgetItem, \
@@ -7,6 +9,15 @@ from Cyber_Scripts import *
 import validators
 from Main.main_GUI import MainWindow
 
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
+import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.use('Qt5Agg')
+
+
+# TODO: clean up code
+# TODO: set size of progress bar
 
 def get_script_module(script_name):
     full_name = f"Cyber_Scripts.{script_name}"
@@ -23,27 +34,129 @@ class Worker(QObject):
     logged = pyqtSignal(str)
     progressed = pyqtSignal(float)
     finished = pyqtSignal(str)
+    grid_sized = pyqtSignal(int, int)
+    analyzed = pyqtSignal(FigureCanvasQTAgg, int, int)
 
     def __init__(self, scripts: list, targets: dict, total: int):
         super().__init__()
         self.scripts = scripts
         self.targets = targets
         self.total = total
+        self.ddos_active = 0
+        self.ddos_graphs = []
+        self.raw_data = {}
 
     def attack(self):
-        count = 1
+        try:
+            count = 1
+            for script in self.scripts:
+                qlist: QListWidget = self.targets[script]
+                self.logged.emit(f"{script} now begins")
+                for i in range(2, qlist.count()):
+                    item = qlist.item(i)
+                    widget: TargetListItem = qlist.itemWidget(item)
+                    data: Data = widget.data
+
+                    if widget.active_checkbox.isChecked():
+                        data_tuple = widget.data_to_tuple()
+                        if script == "Dos":  # TODO: change this when dos module name is changed
+                            self.ddos_active += 1
+                            pass
+
+                        # beginning of attack
+                        self.logged.emit("beginning of attack")  # TODO: Amit change this
+
+                        start = time.time()  # start measure time
+                        data.passed = execute_script(script, data_tuple)  # perform attack
+                        finish = time.time()  # end measure time
+                        data.time = finish - start  # get measurement
+
+                        # ending attack
+                        self.logged.emit(
+                            "ending of attack")  # TODO: Amit change this
+                        self.logged.emit(f'attack time: {data.time:.2f}\n\n')
+
+                        self.raw_data[script].append(data)
+
+                    self.logged.emit(data.get_address())
+                    self.progressed.emit((count / self.total) * 100)
+                    count += 1
+
+            self.export_data()
+            self.finished.emit('done')
+
+        except:
+            return
+
+    def export_data(self):
+        results = {}
         for script in self.scripts:
-            qlist: QListWidget = self.targets[script]
-            self.logged.emit(f"{script} now begins")
-            for i in range(2, qlist.count()):
-                item = qlist.item(i)
-                widget: TargetListItem = qlist.itemWidget(item)
-                data: Data = widget.data
-                time.sleep(5)
-                self.logged.emit(data.get_address())
-                self.progressed.emit((count / self.total) * 100)
-                count += 1
-        self.finished.emit('done')
+            if script == "Dos":  # TODO: change dos to DDoS
+                continue
+            data_list: list = self.raw_data[script]
+            if len(data_list) == 0:
+                continue
+            # (success rate, avg success time)
+            success_rate = 0
+            avg_time = 0
+            for data in data_list:
+                if data.passed:
+                    success_rate += 1
+                    avg_time += data.time
+            avg_time /= success_rate
+            success_rate /= len(data_list)
+            results[script] = (success_rate, avg_time)
+
+        self.analyze(results)
+
+    def analyze(self, results):
+        rows, cols = self.set_grid_size()
+        # results look like this -> result[script] = (success rate, average time)
+        # currently passed means the attack failed
+        i = 0
+        for row in range(rows):
+            for col in range(cols):
+                # start with ddos
+                if i < len(self.ddos_graphs):
+                    graph = self.ddos_graphs[i]
+                    i += 1
+                    canvas = FigureCanvasQTAgg(graph)
+                    self.analyzed.emit(canvas, row, col)
+                    continue
+
+                # continue with other scripts
+                try:
+                    name = self.scripts[i]  # name of current script results
+                    i += 1
+                    rate, avg_time = results[name]  # results
+                except:
+                    continue
+                rate *= 100  # change from fraction to percentage
+
+                # pie chart attributes
+                fig, ax = plt.subplots()
+                labels = ["Vulnerable", "resistant"]
+                sizes = [rate, 100 - rate]
+                colors = ['red', 'green']  # red for attack success
+                explode = [0.1, 0]
+
+                # create pie chart
+                ax.pie(sizes, explode=explode, labels=labels, colors=colors,
+                       autopct='%1.1f%%', shadow=False, startangle=90)
+                # title and annotation of the plot
+                ax.set_title(name)
+                fig.text(0.5, 0.03, f'Average successful execution time: {avg_time:.2f}', ha='center')
+                canvas = FigureCanvasQTAgg(fig)
+                self.analyzed.emit(canvas, row, col)
+
+    def set_grid_size(self):
+        graphs_amount = (len(self.scripts) - 1) + self.ddos_active  # amount of scripts - ddos + active ddos targets
+        nearest_square = round(math.sqrt(graphs_amount)) ** 2
+        rows = cols = int(math.sqrt(nearest_square))
+        if graphs_amount > nearest_square:
+            cols += 1
+        self.grid_sized.emit(rows, cols)
+        return rows, cols
 
 
 class AIOTab(QWidget):
@@ -86,7 +199,6 @@ class TabUI(QWidget):
         self.bar = QProgressBar(self)
         self.layout.addWidget(self.bar)
         self.bar.hide()
-
 
         # create and add "scripts"
         self.scripts = QListWidget(parent=self)
@@ -236,6 +348,7 @@ class TabUI(QWidget):
             self.thread.started.connect(self.worker.attack)
             self.worker.logged.connect(self.write_log)
             self.worker.progressed.connect(self.percentage_done)
+            self.worker.grid_sized.connect(self.container.output.set_grid)
             self.worker.finished.connect(self.done)
             self.worker.finished.connect(self.thread.quit)
             self.worker.finished.connect(self.worker.deleteLater)
