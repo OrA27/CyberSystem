@@ -1,6 +1,6 @@
 import requests
 from GUI_Package import *
-from PyQt6.QtCore import Qt, QItemSelectionModel, pyqtSignal, QObject
+from PyQt6.QtCore import Qt, QItemSelectionModel, pyqtSignal, QObject, QThread
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle, QListWidgetItem, \
     QCheckBox
 from Cyber_Scripts import *
@@ -33,7 +33,7 @@ class Worker(QObject):
         count = 1
         for script in self.scripts:
             qlist: QListWidget = self.targets[script]
-            for i in range(qlist.count()):
+            for i in range(2, qlist.count()):
                 item = qlist.item(i)
                 widget: TargetListItem = qlist.itemWidget(item)
                 data: Data = widget.data
@@ -214,27 +214,38 @@ class TabUI(QWidget):
 
     def initiate_attacks(self):
         try:
-            # perform changes in UI
-            self.container.output.clear()
-            self.container.logs.clear()
+            # create thread & worker here
+            self.worker = Worker(self.script_names, self.existing_targets, self.count_active_targets())
+            self.thread = QThread()
 
-            # create worker here
+            # move worker to thread
+            self.worker.moveToThread(self.thread)
 
             # connect all signals and functions
-            # thread.started.connect(worker.run)
+            self.thread.started.connect(self.clear_container)
+            self.thread.started.connect(self.worker.attack)
+            self.worker.progressed.connect(self.write_log)
+            self.worker.finished.connect(self.done)
+            self.worker.finished.connect(self.thread.quit)
+            self.worker.finished.connect(self.worker.deleteLater)
 
             # start thread
+            self.thread.start()
 
-            # go over each item in each QList and execute an attack - this should be in worker
-
-            # get texts as emits from scripts
-            # self.log.append(f'attack time: {data.time:.2f}\n\n')
+            # function currently only reads from the lists and then logs it in the log tab
 
 
 
 
         except:
             return
+
+    def write_log(self, txt, percentage):
+        self.log.append(txt)
+        print(f'{percentage:.1f}%')
+
+    def done(self, txt):
+        self.log.append(txt)
 
     def count_active_targets(self):
         counter = 0
@@ -273,6 +284,10 @@ class TabUI(QWidget):
             success_rate /= len(data_list)
             results[script] = (success_rate, avg_time)
         self.container.output.analyze(results)  # enable later
+
+    def clear_container(self):
+        self.container.output.clear()
+        self.container.logs.clear()
 
 
 class Data:
