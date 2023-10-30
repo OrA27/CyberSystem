@@ -20,7 +20,8 @@ def execute_script(script_name, arg, output):
 
 
 class Worker(QObject):
-    progressed = pyqtSignal(str, int)
+    logged = pyqtSignal(str)
+    progressed = pyqtSignal(float)
     finished = pyqtSignal(str)
 
     def __init__(self, scripts: list, targets: dict, total: int):
@@ -33,12 +34,14 @@ class Worker(QObject):
         count = 1
         for script in self.scripts:
             qlist: QListWidget = self.targets[script]
+            self.logged.emit(f"{script} now begins")
             for i in range(2, qlist.count()):
                 item = qlist.item(i)
                 widget: TargetListItem = qlist.itemWidget(item)
                 data: Data = widget.data
-
-                self.progressed.emit(data.get_address(), (count / self.total) * 100)
+                time.sleep(5)
+                self.logged.emit(data.get_address())
+                self.progressed.emit((count / self.total) * 100)
                 count += 1
         self.finished.emit('done')
 
@@ -224,7 +227,8 @@ class TabUI(QWidget):
             # connect all signals and functions
             self.thread.started.connect(self.clear_container)
             self.thread.started.connect(self.worker.attack)
-            self.worker.progressed.connect(self.write_log)
+            self.worker.logged.connect(self.write_log)
+            self.worker.progressed.connect(self.percentage_done)
             self.worker.finished.connect(self.done)
             self.worker.finished.connect(self.thread.quit)
             self.worker.finished.connect(self.worker.deleteLater)
@@ -240,9 +244,11 @@ class TabUI(QWidget):
         except:
             return
 
-    def write_log(self, txt, percentage):
+    def write_log(self, txt):
         self.log.append(txt)
-        print(f'{percentage:.1f}%')
+
+    def percentage_done(self, percentage):
+        self.log.append(f'{percentage:.1f}% done')
 
     def done(self, txt):
         self.log.append(txt)
