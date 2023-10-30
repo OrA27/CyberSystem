@@ -76,10 +76,17 @@ class TabUI(QWidget):
         self.active_script = self.script_names[0]
         self.raw_data = {}  # key: script ;; value: list of data objects
         self.container: MainWindow = self.parent().parent()
+        self.aio: AIOTab = self.parent()
         self.log: QTextEdit = self.container.logs.text_field
 
         # create main layout
         self.layout = QHBoxLayout(self)  # main layout
+
+        # create progress bar
+        self.bar = QProgressBar(self)
+        self.layout.addWidget(self.bar)
+        self.bar.hide()
+
 
         # create and add "scripts"
         self.scripts = QListWidget(parent=self)
@@ -225,13 +232,14 @@ class TabUI(QWidget):
             self.worker.moveToThread(self.thread)
 
             # connect all signals and functions
-            self.thread.started.connect(self.clear_container)
+            self.thread.started.connect(self.attack_setup)
             self.thread.started.connect(self.worker.attack)
             self.worker.logged.connect(self.write_log)
             self.worker.progressed.connect(self.percentage_done)
             self.worker.finished.connect(self.done)
             self.worker.finished.connect(self.thread.quit)
             self.worker.finished.connect(self.worker.deleteLater)
+            self.worker.finished.connect(self.return_to_default)
 
             # start thread
             self.thread.start()
@@ -248,6 +256,7 @@ class TabUI(QWidget):
         self.log.append(txt)
 
     def percentage_done(self, percentage):
+        self.bar.setValue(int(percentage))
         self.log.append(f'{percentage:.1f}% done')
 
     def done(self, txt):
@@ -291,9 +300,37 @@ class TabUI(QWidget):
             results[script] = (success_rate, avg_time)
         self.container.output.analyze(results)  # enable later
 
-    def clear_container(self):
+    def attack_setup(self):
+        # clear logs tab
         self.container.output.clear()
         self.container.logs.clear()
+
+        # reset progress bar
+        self.bar.setValue(0)
+
+        # hide elements
+        self.aio.begin_button.hide()
+        self.active_form_widget.hide()
+        self.existing_targets_widget.hide()
+        self.scripts.hide()
+
+        # show progress bar
+        self.bar.show()
+
+        # self.container.tabs.setCurrentIndex(1)
+
+    def return_to_default(self):
+        # hide progress bar
+        self.bar.hide()
+
+        # show elements
+        self.scripts.show()
+        self.existing_targets_widget.show()
+        self.active_form_widget.show()
+        self.aio.begin_button.show()
+
+        # show out put tab
+        self.container.tabs.setCurrentIndex(2)
 
 
 class Data:
