@@ -1,7 +1,6 @@
 import requests
 from GUI_Package import *
-from PyQt6.QtCore import Qt, QItemSelectionModel, pyqtSignal
-from PyQt6.QtGui import QFont, QTransform, QIcon
+from PyQt6.QtCore import Qt, QItemSelectionModel, pyqtSignal, QObject
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle, QListWidgetItem, \
     QCheckBox
 from Cyber_Scripts import *
@@ -18,6 +17,30 @@ def get_script_module(script_name):
 def execute_script(script_name, arg, output):
     module = get_script_module(script_name)
     return module.execute(*arg, output=output)
+
+
+class Worker(QObject):
+    progressed = pyqtSignal(str, int)
+    finished = pyqtSignal(str)
+
+    def __init__(self, scripts: list, targets: dict, total: int):
+        super().__init__()
+        self.scripts = scripts
+        self.targets = targets
+        self.total = total
+
+    def attack(self):
+        count = 1
+        for script in self.scripts:
+            qlist: QListWidget = self.targets[script]
+            for i in range(qlist.count()):
+                item = qlist.item(i)
+                widget: TargetListItem = qlist.itemWidget(item)
+                data: Data = widget.data
+
+                self.progressed.emit(data.get_address(), (count / self.total) * 100)
+                count += 1
+        self.finished.emit('done')
 
 
 class AIOTab(QWidget):
@@ -39,9 +62,7 @@ class AIOTab(QWidget):
         self.setLayout(self.layout)
 
     def begin(self):
-        self.begin_button.setEnabled(False)
-        self.ui.begin()
-        self.begin_button.setEnabled(True)
+        self.ui.initiate_attacks()
 
 
 class TabUI(QWidget):
@@ -162,10 +183,12 @@ class TabUI(QWidget):
 
     def begin(self):
         try:
-            self.container.output.clear()
-            self.container.logs.clear()
-            print(self.container.findChildren(QTextEdit))
-            for script in self.script_names:
+            self.container.output.clear()  # must be in this class
+            self.container.logs.clear()  # must be in this class
+            print(self.container.findChildren(QTextEdit))  # redundant
+            # can be transferred to worker
+            for script in self.script_names:  # send scripts to worker
+                # needs to be changed -> send self.existing targets to worker
                 qlist: QListWidget = self.existing_targets[script]
                 self.raw_data[script] = []
                 if qlist.count() == 0:
@@ -188,6 +211,37 @@ class TabUI(QWidget):
             return
 
         self.export_data()
+
+    def initiate_attacks(self):
+        try:
+            # perform changes in UI
+            self.container.output.clear()
+            self.container.logs.clear()
+
+            # create worker here
+
+            # connect all signals and functions
+            # thread.started.connect(worker.run)
+
+            # start thread
+
+            # go over each item in each QList and execute an attack - this should be in worker
+
+            # get texts as emits from scripts
+            # self.log.append(f'attack time: {data.time:.2f}\n\n')
+
+
+
+
+        except:
+            return
+
+    def count_active_targets(self):
+        counter = 0
+        for script in self.script_names:
+            counter += len(self.active_targets[script])
+
+        return counter
 
     def item_added(self, item: QListWidgetItem):
         widget = self.existing_targets_widget.itemWidget(item)
