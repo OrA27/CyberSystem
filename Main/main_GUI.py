@@ -1,3 +1,4 @@
+from PyQt6 import QtGui
 from PyQt6.QtWidgets import QTabWidget
 from GUI_Package.AIOTab import *
 from GUI_Package.OutputTab import OutputTab
@@ -11,7 +12,15 @@ class MainWindow(QMainWindow):
         super().__init__()
         # Create the main window
         self.setWindowTitle("Cyber Security System")
-        # self.setGeometry(100, 100, 800, 600)
+
+        # set geometry
+        # Set the initial size of the QMainWindow
+        self.setFixedSize(880, 450)
+
+        qr = self.frameGeometry()
+        cp = QtGui.QGuiApplication.primaryScreen().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
         # Create the tab widget
         self.tabs = QTabWidget()
