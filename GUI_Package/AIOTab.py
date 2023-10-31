@@ -25,17 +25,19 @@ def get_script_module(script_name):
     return module
 
 
-def execute_script(script_name, arg, output):
+def execute_script(script_name, arg):
     module = get_script_module(script_name)
-    return module.execute(*arg, output=output)
+    return module.execute(*arg)
 
 
 class Worker(QObject):
     logged = pyqtSignal(str)
     progressed = pyqtSignal(float)
     finished = pyqtSignal(str)
-    grid_sized = pyqtSignal(int, int)
+    grid_sized = pyqtSignal(int, int, int)
     analyzed = pyqtSignal(FigureCanvasQTAgg, int, int)
+    analyzed2 = pyqtSignal(dict)
+    ddos_painted = pyqtSignal(list)
 
     def __init__(self, scripts: list, targets: dict, total: int):
         super().__init__()
@@ -50,6 +52,7 @@ class Worker(QObject):
         try:
             count = 1
             for script in self.scripts:
+                self.raw_data[script] = []
                 qlist: QListWidget = self.targets[script]
                 self.logged.emit(f"{script} now begins")
                 for i in range(2, qlist.count()):
@@ -61,7 +64,8 @@ class Worker(QObject):
                         data_tuple = widget.data_to_tuple()
                         if script == "Dos":  # TODO: change this when dos module name is changed
                             self.ddos_active += 1
-                            pass
+                            result = execute_script(script, data_tuple)
+                            self.ddos_graphs.append(result)
 
                         # beginning of attack
                         self.logged.emit("beginning of attack")  # TODO: Amit change this
@@ -72,8 +76,7 @@ class Worker(QObject):
                         data.time = finish - start  # get measurement
 
                         # ending attack
-                        self.logged.emit(
-                            "ending of attack")  # TODO: Amit change this
+                        self.logged.emit("ending of attack")  # TODO: Amit change this
                         self.logged.emit(f'attack time: {data.time:.2f}\n\n')
 
                         self.raw_data[script].append(data)
@@ -82,11 +85,17 @@ class Worker(QObject):
                     self.progressed.emit((count / self.total) * 100)
                     count += 1
 
+            self.set_grid_size()
+            # self.send_ddos_graphs()
+            self.ddos_painted.emit(self.ddos_graphs)
             self.export_data()
             self.finished.emit('done')
 
         except:
             return
+
+    # def send_ddos_graphs(self):
+    #     self.dd
 
     def export_data(self):
         results = {}
@@ -107,7 +116,8 @@ class Worker(QObject):
             success_rate /= len(data_list)
             results[script] = (success_rate, avg_time)
 
-        self.analyze(results)
+        # self.analyze(results)
+        self.analyzed2.emit(results)
 
     def analyze(self, results):
         rows, cols = self.set_grid_size()
@@ -128,6 +138,9 @@ class Worker(QObject):
                 try:
                     name = self.scripts[i]  # name of current script results
                     i += 1
+                    if name == "Dos":  # TODO change to ddos
+                        name = self.scripts[i]
+                        i += 1
                     rate, avg_time = results[name]  # results
                 except:
                     continue
@@ -155,7 +168,7 @@ class Worker(QObject):
         rows = cols = int(math.sqrt(nearest_square))
         if graphs_amount > nearest_square:
             cols += 1
-        self.grid_sized.emit(rows, cols)
+        self.grid_sized.emit(rows, cols, self.ddos_active)
         return rows, cols
 
 
@@ -350,6 +363,9 @@ class TabUI(QWidget):
             self.worker.progressed.connect(self.percentage_done)
             self.worker.grid_sized.connect(self.container.output.set_grid)
             self.worker.analyzed.connect(self.container.output.add_canvas)
+
+            self.worker.analyzed2.connect(self.container.output.analyze)
+
             self.worker.finished.connect(self.done)
             self.worker.finished.connect(self.thread.quit)
             self.worker.finished.connect(self.worker.deleteLater)
