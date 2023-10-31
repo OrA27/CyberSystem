@@ -406,7 +406,7 @@ class TabUI(QWidget):
 
     def item_changed(self, checked, label):
         active_list = self.active_targets[self.active_script]
-        if checked and label not in active_list:
+        if checked:
             active_list.append(label)
         else:
             active_list.remove(label)
@@ -486,6 +486,12 @@ class Data:
     def get_address(self):
         return self.field_dict["address"]
 
+    def __eq__(self, other):
+        if isinstance(other, Data):
+            return (self.script == other.script) and (self.field_dict == other.field_dict)
+        else:
+            return False
+
 
 class TargetListItem(QWidget):
     checkboxStateChanged = pyqtSignal(bool, str)
@@ -516,6 +522,10 @@ class TargetListItem(QWidget):
 
         self.setLayout(layout)
 
+    def __eq__(self, other):
+        if isinstance(other, TargetListItem):
+            return (self.parent_list == other.parent_list) and (self.data == other.data)
+
     def checkbox_state_changed(self):
         self.checkboxStateChanged.emit(self.active_checkbox.isChecked(), self.label.text())
 
@@ -526,6 +536,14 @@ class TargetListItem(QWidget):
 
     def data_to_tuple(self):
         return tuple(self.data.field_dict.values())
+
+    def is_unique(self):
+        for i in range(2, self.parent_list.count()):
+            item = self.parent_list.item(i)
+            widget: TargetListItem = self.parent_list.itemWidget(item)
+            if self == widget:
+                return False
+        return True
 
 
 class NewTarget(QWidget):
@@ -595,6 +613,12 @@ class NewTarget(QWidget):
 
         return all(valid_list)
 
+    def set_placeholder_text(self, txt):
+        for key in self.field_dict.keys():
+            field: QLineEdit = self.field_dict[key]
+            field.clear()
+            field.setPlaceholderText(txt)
+
     def click(self):
         if not self.validate():
             print("fault")
@@ -604,12 +628,15 @@ class NewTarget(QWidget):
             new_data.field_dict[label] = self.field_dict[label].text()
             # print(label + " : " + self.data.field_dict[label])
         self.add_item(new_data)
-        self.clear_text_fields()
 
     def add_item(self, data):
         item = QListWidgetItem()
         widget = TargetListItem(self.script, data, item, self.parent_list)
+        if not widget.is_unique():
+            self.set_placeholder_text("already exists")
+            return
         item.setSizeHint(widget.sizeHint())
         self.parent_list.addItem(item)
         self.parent_list.setItemWidget(item, widget)
         self.parent_list.parent().item_added(item)
+        self.clear_text_fields()
