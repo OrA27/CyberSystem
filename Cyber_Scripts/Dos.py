@@ -90,98 +90,103 @@ def response_time_iterate(server_ip, port, q):
 # print(get_response_time("10.100.102.19", 8000))
 
 
+def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_threads=10, samples_for_avg=10):
+    # sample iterations
+    iter = 1
 
-# Create a queue for communication between threads
-# result_queue = Queue()
-iter = 1
-# from func
-avg_iter = 0
-res_sum = 0
-res_avg = 0
-server_ip = "10.100.102.19"
-server_port = 8000
+    # total number of samples averages
+    num_of_samples = (1+num_of_threads) * response_avgs_between_threads
 
-# Create a thread for your function
-# worker_thread = threading.Thread(target=response_time_iterate, args=("10.100.102.19", 8000, result_queue))
-# worker_thread.daemon = True  # This allows the program to exit when the main thread exits
-# worker_thread.start()
+    # iterations to calculate avg of responses
+    avg_iter = 0
 
-num_of_threads = 10
-dos_threads = []
-iter_list = []
-response_times_list = []
+    # sum of responses to calculate average
+    res_sum = 0
 
-for i in range(num_of_threads):
-    dos_threads.append(threading.Thread(target=dos, args=(server_ip, server_port), daemon=True))
+    # response time average
+    res_avg = 0
+
+    # list of dos threads
+    dos_threads = []
+
+    # list of iterations for the graph
+    iter_list = []
+
+    # list of response times for the graph
+    response_times_list = []
+
+    # initialize dos threads
+    for i in range(num_of_threads):
+        dos_threads.append(threading.Thread(target=dos, args=(server_ip, server_port), daemon=True))
+
+    while iter < (num_of_samples+1):
+        try:
+            # calculate response times averages
+            while avg_iter < samples_for_avg:
+                response_time = get_response_time(server_ip, server_port)
+                if response_time is None:
+                    print("error")
+                else:
+                    res_sum += response_time
+                    avg_iter += 1
+                    time.sleep(1/samples_for_avg)
+            res_avg = res_sum / avg_iter
+            # reset average variables after calculating the average
+            avg_iter = 0
+            res_sum = 0
+            # append the iteration to the list
+            iter_list.append(iter-1)
+            # append the response time average to the list
+            response_times_list.append(res_avg)
+            # print the response time average
+            print(f"response time: %.2f" % res_avg)
+
+            # starting dos thread at the required time
+            if num_of_samples > iter >= response_avgs_between_threads and iter % response_avgs_between_threads == 0:
+                print(f"\n\n\nadd dos thread number {(iter//10)-1}\n\n\n")
+                dos_threads[(iter // response_avgs_between_threads) - 1].start()
+            iter += 1
+
+        except KeyboardInterrupt:
+            break
+
+    print(iter_list)
+    print(response_times_list)
+    plt.plot(iter_list, response_times_list)
+
+    # naming the time in sec axis
+    plt.xlabel('Threads')
+
+    # naming the response time in ms axis
+    plt.ylabel('Response time')
+
+    # giving a title to my graph
+    plt.title('Server response time depending on threads')
+
+    # Set the x-axis limits to start at 0 and end at 110
+    plt.xlim(0, (num_of_samples))
+
+    # Set tick marks on the x-axis at every 10 units
+    plt.xticks(range(0, (num_of_samples+1), response_avgs_between_threads))
+
+    # Enable minor ticks at intervals of 0.5 units
+    minor_locator = MultipleLocator(1)
+    plt.gca().xaxis.set_minor_locator(minor_locator)
+
+    # Create custom labels for the major ticks
+    major_tick_locations = range(response_avgs_between_threads, (num_of_threads * response_avgs_between_threads + 1), response_avgs_between_threads)
+    major_tick_labels = [f'Th{(loc // response_avgs_between_threads) - 1}' for loc in major_tick_locations]
+
+    # Set major tick marks on the x-axis and apply custom labels
+    plt.xticks(major_tick_locations, major_tick_labels)
+
+    plt.grid(which='both', linestyle=':', linewidth=0.5)
+
+    return plt
+
+    # plt.show()
 
 
-# Main thread
-while iter<111:
-    try:
-        # Get the result from the queue (blocks until a result is available)
-        # result = result_queue.get()
+plot = execute("10.100.102.19", 8000)
 
-        #from func
-        while avg_iter<10:
-            response_time = get_response_time(server_ip, server_port)
-            if response_time is None:
-                print("error")
-            else:
-                # print(f"response time: {response_time}")
-                res_sum += response_time
-                avg_iter += 1
-                time.sleep(0.1)
-        res_avg = res_sum / avg_iter
-        # q.put(res_avg)
-        # iter += 1
-        avg_iter = 0
-        res_sum = 0
-        iter_list.append(iter-1)
-        response_times_list.append(res_avg)
-
-        print(f"response time: %.2f" % res_avg)
-
-        if 110 > iter >= 10 and iter % 10 == 0:
-            print(f"\n\n\nadd dos thread number {(iter//10)-1}\n\n\n")
-            dos_threads[(iter//10)-1].start()
-        iter += 1
-
-        # You can use the result as needed in the main thread
-        # For example, you can send it to another function or process it further.
-
-    except KeyboardInterrupt:
-        break
-
-print(iter_list)
-print(response_times_list)
-plt.plot(iter_list, response_times_list)
-
-# naming the time in sec axis
-plt.xlabel('Threads')
-
-# naming the response time in ms axis
-plt.ylabel('Response time')
-
-# giving a title to my graph
-plt.title('Server response time depending on threads')
-
-# Set the x-axis limits to start at 0 and end at 110
-plt.xlim(0, 110)
-
-# Set tick marks on the x-axis at every 10 units
-plt.xticks(range(0, 111, 10))
-
-# Enable minor ticks at intervals of 0.5 units
-minor_locator = MultipleLocator(1)
-plt.gca().xaxis.set_minor_locator(minor_locator)
-
-# Create custom labels for the major ticks
-major_tick_locations = range(10, 101, 10)
-major_tick_labels = [f'Th{(loc // 10) - 1}' for loc in major_tick_locations]
-
-# Set major tick marks on the x-axis and apply custom labels
-plt.xticks(major_tick_locations, major_tick_labels)
-
-plt.grid(which='both', linestyle=':', linewidth=0.5)
-
-plt.show()
+plot.show()
