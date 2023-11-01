@@ -492,6 +492,21 @@ class Data:
         else:
             return False
 
+    def set_field_dict(self, field_dict):
+        self.field_dict = field_dict
+
+    def to_dict(self):
+        return {
+            'field_dict': self.field_dict,
+            'script': self.script,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        dt = cls(data['script'])
+        dt.set_field_dict(data['field_dict'])
+        return dt
+
 
 class TargetListItem(QWidget):
     checkboxStateChanged = pyqtSignal(bool, str)
