@@ -201,6 +201,7 @@ class TabUI(QWidget):
         self.script_names = list_package_modules("Cyber_Scripts")
         self.active_script = self.script_names[0]
         self.raw_data = {}  # key: script ;; value: list of data objects
+        self.saved_data = {}  # saved data
         self.container: MainWindow = self.parent().parent()
         self.aio: AIOTab = self.parent()
         self.log: QTextEdit = self.container.logs.text_field
@@ -272,6 +273,7 @@ class TabUI(QWidget):
             self.layout.addWidget(new_list)  # add list to the target widget
             self.layout.addWidget(new_form)  # add form to the target widget
             self.active_targets[script] = []  # create the active target list
+            self.saved_data[script] = []
 
             self.existing_targets[script] = new_list
             self.forms[script] = new_form
@@ -643,6 +645,7 @@ class NewTarget(QWidget):
             new_data.field_dict[label] = self.field_dict[label].text()
             # print(label + " : " + self.data.field_dict[label])
         self.add_item(new_data)
+        self.save_data(new_data)
 
     def add_item(self, data):
         item = QListWidgetItem()
@@ -655,3 +658,8 @@ class NewTarget(QWidget):
         self.parent_list.setItemWidget(item, widget)
         self.parent_list.parent().item_added(item)
         self.clear_text_fields()
+
+    def save_data(self, data):
+        container: TabUI = self.parent_list.parent()
+        dt_dict = data.to_dict()
+        container.saved_data[self.script].append(dt_dict)
