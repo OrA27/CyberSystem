@@ -1,3 +1,5 @@
+import pickle
+
 import requests
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 
@@ -28,6 +30,29 @@ def get_script_module(script_name):
 def execute_script(script_name, arg):
     module = get_script_module(script_name)
     return module.execute(*arg)
+
+
+def file_path(file_name: str):
+    # replace spaces
+    file_name = file_name.replace(" ", "_")
+
+    # Define the path to the current Python file
+    current_file_path = os.path.abspath(__file__)
+
+    # Get the directory containing the current Python file
+    current_directory = os.path.dirname(current_file_path)
+
+    # Get the parent directory of the current directory
+    parent_directory = os.path.dirname(current_directory)
+
+    # Define the path to the new folder and the new file
+    new_folder_path = os.path.join(parent_directory, "Saved")
+    new_file_path = os.path.join(new_folder_path, (file_name+".pkl"))
+
+    # Create the new folder
+    os.makedirs(new_folder_path, exist_ok=True)
+
+    return new_file_path
 
 
 class Worker(QObject):
@@ -204,6 +229,7 @@ class TabUI(QWidget):
         self.container: MainWindow = self.parent().parent()
         self.aio: AIOTab = self.parent()
         self.log: QTextEdit = self.container.logs.text_field
+        self.files_paths: dict = {}
 
         # create main layout
         self.layout = QHBoxLayout(self)  # main layout
@@ -239,6 +265,59 @@ class TabUI(QWidget):
 
         # self.layout.addWidget(self.target_list_widget)
         self.setLayout(self.layout)
+
+        # initialize data list for scripts
+        self.data_lists = {}
+
+        # Get/Set save files
+        self.create_save_files()
+
+        # test
+        self.load_items()
+
+    def create_save_files(self):
+        for script in self.script_names:
+            self.files_paths[script] = file_path(script)
+            if not os.path.exists(self.files_paths[script]):
+                open(self.files_paths[script], "w")
+
+    def load_items(self):
+        # self.scripts.setCurrentRow(1)
+        # test_data = Data("Dos")
+        # test_data.field_dict["address"] = "9"
+        # self.forms["Dos"].add_item(test_data)
+
+        for index, script in enumerate(self.script_names):
+            self.scripts.setCurrentRow(index)
+            self.data_lists[script] = []
+            try:
+                with open(self.files_paths[script], 'rb') as file:
+                    try:
+                        while True:
+                            instance = pickle.load(file)
+                            self.data_lists[script].append(instance)
+                            self.forms[script].add_item(instance, saved=True)
+                    except EOFError:
+                        pass
+            except (FileNotFoundError, IOError):
+                # Handle errors or the case where the file doesn't exist
+                print(self.files_paths[script] + "not found")
+        self.scripts.setCurrentRow(0)
+
+    def save_another_item(self, data):
+        self.data_lists[self.active_script].append(data)
+        with open(self.files_paths[self.active_script], "ab") as file:
+            pickle.dump(data, file)
+
+    def save_all_items(self, script):
+        with open(self.files_paths[script], "wb") as file:
+            for data in self.data_lists[script]:
+                pickle.dump(data, file)
+
+    def remove_data_from_list(self, data):
+        script = self.active_script
+        self.data_lists[script].remove(data)
+        self.save_all_items(script)
 
     def load_ui(self):
         self.scripts.addItems(self.script_names)
@@ -399,10 +478,14 @@ class TabUI(QWidget):
 
         return counter
 
-    def item_added(self, item: QListWidgetItem):
+    def item_added(self, saved, item: QListWidgetItem):
         widget = self.existing_targets_widget.itemWidget(item)
         widget.checkboxStateChanged.connect(self.item_changed)
         widget.active_checkbox.setCheckState(Qt.CheckState.Checked)
+
+        # save the data
+        if not saved:
+            self.save_another_item(widget.data)
 
     def item_changed(self, checked, label):
         active_list = self.active_targets[self.active_script]
@@ -534,6 +617,9 @@ class TargetListItem(QWidget):
         self.parent_list.takeItem(self.parent_list.row(self.parent_item))
         self.deleteLater()
 
+        # save all other items
+        self.parent_list.parent().remove_data_from_list(self.data)
+
     def data_to_tuple(self):
         return tuple(self.data.field_dict.values())
 
@@ -629,7 +715,7 @@ class NewTarget(QWidget):
             # print(label + " : " + self.data.field_dict[label])
         self.add_item(new_data)
 
-    def add_item(self, data):
+    def add_item(self, data, saved=False):
         item = QListWidgetItem()
         widget = TargetListItem(self.script, data, item, self.parent_list)
         if not widget.is_unique():
@@ -638,5 +724,5 @@ class NewTarget(QWidget):
         item.setSizeHint(widget.sizeHint())
         self.parent_list.addItem(item)
         self.parent_list.setItemWidget(item, widget)
-        self.parent_list.parent().item_added(item)
+        self.parent_list.parent().item_added(saved=saved, item=item)
         self.clear_text_fields()
