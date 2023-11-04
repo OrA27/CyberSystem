@@ -5,8 +5,6 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 
 
-# TODO change format for average execution time
-
 class OutputTab(QWidget):
     def __init__(self, parent):
         super().__init__(parent=parent)
