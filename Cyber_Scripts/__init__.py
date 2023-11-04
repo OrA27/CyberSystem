@@ -1,32 +1,17 @@
-# import nmap3
 # import nmap
 from scapy.all import *
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-import socket as s
-from datetime import datetime
-from deprecated import deprecated
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common import UnexpectedAlertPresentException
 from selenium.webdriver.common.keys import Keys
 
-# variables
-# path to the output file
-out_path = "../Output.txt"
-# targeted IPs
-IP_list = ['192.168.68.59']
-# source IP of the adversary
-source_ip = ""
-# source port of adversary
-source_port = 80
-# port of the targeted IP
-target_port = 80
 
 """
 # functions
 def get_open_ports_nmap(ip: str, amount: int = 50):
     open_ports = []
-    nm = nmap3.Nmap()
+    nm = nmap.Nmap()
     nm.scan_top_ports(ip, default=amount)
     my_dict = dict(nm.top_ports)  # turn to dictionary
     port_list = next(iter(my_dict.items()))[1]['ports']  # get the ports list
@@ -75,9 +60,8 @@ def enter_login_input(login_page_url, user_name, password):
     input_elements = [element for element in input_elements if element.is_displayed()]
 
     for i in range(2):
-        name = input_elements[i].get_attribute("name")
-        # print("name: " + name)
-        script = f"document.getElementsByName('{name}')[0].type = 'text';"
+        html_obj_name = input_elements[i].get_attribute("name")
+        script = f"document.getElementsByName('{html_obj_name}')[0].type = 'text';"
         driver.execute_script(script)
 
     # Find and click the submit button
@@ -109,8 +93,6 @@ def enter_login_input(login_page_url, user_name, password):
     try:
         new_url = driver.current_url
         new_url = new_url.split("?")[0]
-        print(new_url)
-        print(login_page_url)
         passed = login_page_url != new_url
         return passed
     except:
@@ -118,5 +100,3 @@ def enter_login_input(login_page_url, user_name, password):
     finally:
         # Close the browser window
         driver.quit()
-
-    # return driver, input_elements[0], input_elements[1], button_elements[-1]
