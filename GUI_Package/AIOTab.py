@@ -33,9 +33,9 @@ class Worker(QObject):
         self.raw_data = {}
 
     def attack(self):
-        try:
-            count = 1
-            for script in self.scripts:
+        count = 1
+        for script in self.scripts:
+            try:
                 self.raw_data[script] = []
                 qlist: QListWidget = self.targets[script]
                 self.logged.emit(f"{script} now begins")
@@ -68,14 +68,16 @@ class Worker(QObject):
                     self.logged.emit(data.get_address())
                     self.progressed.emit((count / self.total) * 100)
                     count += 1
+            except Exception as e:
+                self.logged.emit(f"ERROR: {e}")
 
+        try:
             self.set_grid_size()
             self.ddos_painted.emit(self.ddos_graphs)
             self.export_data()
             self.finished.emit('done')
-
-        except:
-            return
+        except Exception as e:
+            self.logged.emit(f"ERROR: {e}")
 
     def export_data(self):
         results = {}
@@ -302,7 +304,8 @@ class TabUI(QWidget):
 
             # start thread
             self.thread.start()
-        except:
+        except Exception as e:
+            self.log.append(f'ERROR: {e}')
             return
 
     def write_log(self, txt):
