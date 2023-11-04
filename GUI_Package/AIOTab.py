@@ -149,6 +149,7 @@ class TabUI(QWidget):
 
         # create progress bar
         self.bar = QProgressBar(self)
+        self.bar.setFixedWidth(786)
         self.layout.addWidget(self.bar)
         self.bar.hide()
 
