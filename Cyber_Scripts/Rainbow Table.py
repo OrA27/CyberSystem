@@ -1,4 +1,3 @@
-import rainbowtables as rt
 import time
 
 from PyQt6.QtWidgets import QTextEdit
@@ -7,28 +6,6 @@ from selenium.webdriver.common.by import By
 from Cyber_Scripts import *
 import hashlib
 import os
-
-"""
-# old code
-
-def create_table(wordlists, path="/rainbow_tables", file_name="rainbow_table", hash_type="sha256"):
-    rt.set_directory(path, full_path=False)
-    rt.set_filename(file_name)
-
-    rt.create_directory()
-    rt.create_file()
-    rt.insert_wordlists(wordlists, hash_type, wordlist_encoding="utf-8", display_progress=True, compression=True)
-
-
-# hashed is the hashed value of the real password
-def hash_lookup(hashed, table="rainbow_table"):
-    lookup = rt.search(hashed, table, full_path=True, time_took=True, compression=True)
-    # false if search failed
-    # else tuple plaintext and time took to find
-    # plaintext is a password that gives the same hashed value like the original function
-    return lookup
-
-"""
 
 
 def get_table_path():
@@ -70,9 +47,6 @@ def hash_word(word, hash_type):
 
 
 def create_table(words_list=None, hash_type="md5", sub_hash=None):
-    word_txt = ""
-    word_hash = ""
-
     new_file_path = get_table_path()
 
     # write teh words in the word list into the file
@@ -94,33 +68,28 @@ def hash_lookup(hashed):
         return False
 
 
-def execute(login_page_url, user_name, hashed, output: QTextEdit):
-    output.append('Rainbow Table Check')
-    output.append(f'Login page url: {login_page_url}')
-    output.append(f'User name: {user_name}')
-    output.append(f'Hashed password: {hashed}')
-    # table creation should happen prior to execution ??
+def execute(login_page_url, user_name, hashed):
+    # output.append('Rainbow Table Check')
+    # output.append(f'Login page url: {login_page_url}')
+    # output.append(f'User name: {user_name}')
+    # output.append(f'Hashed password: {hashed}')
 
-    # extract relevant username and hashed password from db or from GUI
-
-    # lookup the hash in the table
-    # fake_password = hash_lookup(hashed, table)
     fake_password = hash_lookup(hashed)
     if not fake_password:
-        print("Match password was not found")
+        # print("Match password was not found")
         return False
 
     # lookup successful -> go through login flow
     # try to log in
     passed = enter_login_input(login_page_url, user_name, fake_password)
     if passed:
-        print("rainbow table attack succeed")
-        output.append("The Site is vulnerable to the attack\n\n")
+        # output.append("The Site is vulnerable to the attack\n\n")
+        pass
     else:
-        print("rainbow table attack failed")
-        output.append("The Site is not vulnerable to the attack\n\n")
+        # output.append("The Site is not vulnerable to the attack\n\n")
+        pass
     return passed
 
 
 # create_table(words_list=["a", "zzzzzzzzzzzzzzzzzHg8", "b", "zzzzzzzzzzzzzzzzzzzr"], hash_type="md5", sub_hash=5)
-print(execute(login_page_url="http://localhost/site/login.php", user_name="c@c.c", hashed="fd391"))
+# print(execute(login_page_url="http://localhost/site/login.php", user_name="c@c.c", hashed="fd391"))
