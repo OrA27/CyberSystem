@@ -6,16 +6,10 @@ from Cyber_Scripts import *
 from PyQt6.QtWidgets import QTextEdit
 
 
-def execute(upload_page_url, view_page_url, output: QTextEdit):
-    output.append("Remote Control Execution Check")
-    output.append("Upload page url: " + upload_page_url)
-    output.append("View page url: " + view_page_url)
-    """
-    driver = webdriver.Chrome()
-
-    driver.get(upload_page_url)
-    time.sleep(1)
-    """
+def execute(upload_page_url, view_page_url):
+    # output.append("Remote Control Execution Check")
+    # output.append("Upload page url: " + upload_page_url)
+    # output.append("View page url: " + view_page_url)
     driver = create_driver(upload_page_url)
 
     input_elements = driver.find_elements(By.TAG_NAME, "input")
@@ -48,12 +42,13 @@ def execute(upload_page_url, view_page_url, output: QTextEdit):
     page_src = driver.page_source
     passed = "injection.php" in page_src
     if passed:
-        print("The attack succeeded")
-        output.append("The Site is vulnerable to the attack\n\n")
+        pass
+        # print("The attack succeeded")
+        # output.append("The Site is vulnerable to the attack\n\n")
     else:
-        print("The attack failed")
-        output.append("The Site is not vulnerable to the attack\n\n")
+        pass
+        # print("The attack failed")
+        # output.append("The Site is not vulnerable to the attack\n\n")
     return passed
 
-
-execute(upload_page_url='http://localhost/site/upload.html', view_page_url='http://localhost/site/view_image.php')
+# execute(upload_page_url='http://localhost/site/upload.html', view_page_url='http://localhost/site/view_image.php')
