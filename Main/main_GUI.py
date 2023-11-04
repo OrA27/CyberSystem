@@ -1,5 +1,5 @@
 from PyQt6 import QtGui
-from PyQt6.QtWidgets import QTabWidget
+from PyQt6.QtWidgets import QTabWidget, QMainWindow, QApplication
 from GUI_Package.AIOTab import *
 from GUI_Package.OutputTab import OutputTab
 from GUI_Package.LogsTab import LogsTab
@@ -37,16 +37,10 @@ class MainWindow(QMainWindow):
         # create top label
         self.message_of_the_day = QLabel("Testing testing one two three")
 
-        # create begin button
-        # self.begin_button = QPushButton("Begin")
-        # self.begin_button.setFixedWidth(200)
-
         # Create a vertical layout for the tab widget
         self.window_vbox = QVBoxLayout()
         self.window_vbox.addWidget(self.message_of_the_day, alignment=Qt.AlignmentFlag.AlignCenter)
         self.window_vbox.addWidget(self.tabs)
-        # self.window_vbox.addWidget(self.begin_button)  # , alignment=Qt.AlignmentFlag.AlignRight)
-
 
         # Set the main window layout to the horizontal layout
         self.main_widget = QWidget(self)

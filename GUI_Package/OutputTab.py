@@ -1,9 +1,7 @@
-import math
 from PyQt6.QtWidgets import QWidget, QGridLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 import matplotlib.pyplot as plt
 import matplotlib
-
 matplotlib.use('Qt5Agg')
 
 
@@ -20,23 +18,11 @@ class OutputTab(QWidget):
 
         # layout
         self.layout = QGridLayout(self)
-        # either add message for no output or disable the tab until begin function has finished
-
-    def get_rows_cols(self):
-        scripts_amount = len(self.script_names)
-        nearest_square = round(math.sqrt(scripts_amount)) ** 2
-        rows = cols = int(math.sqrt(nearest_square))
-        if scripts_amount > nearest_square:
-            cols += 1
-        return rows, cols
 
     def set_grid(self, rows, cols, ddos_amount):
         self.rows = rows
         self.cols = cols
         self.ddos_amount = ddos_amount
-
-    def set_ddos_graphs(self, ddos_graphs):
-        self.ddos_graphs = ddos_graphs
 
     def analyze(self, results):
         # results look like this -> result[script] = (success rate, average time)
@@ -79,53 +65,6 @@ class OutputTab(QWidget):
                 fig.text(0.5, 0.03, f'Average successful execution time: {avg_time:.2f}', ha='center')
                 canvas = FigureCanvasQTAgg(fig)
                 self.layout.addWidget(canvas, row, col)
-
-    def analyze2(self, results):
-        # rows, cols = self.set_grid_size()
-        # results look like this -> result[script] = (success rate, average time)
-        # currently passed means the attack failed
-        i = 0
-        for row in range(self.rows):
-            for col in range(self.cols):
-                # start with ddos
-                if i < self.ddos_amount:
-                    graph = self.ddos_graphs[i]
-                    i += 1
-                    ddos_canvas = FigureCanvasQTAgg(graph)
-                    # self.analyzed.emit(canvas, row, col)
-                    self.layout.addWidget(ddos_canvas, row, col)
-                    continue
-
-                # continue with other scripts
-                try:
-                    name = self.script_names[i]  # name of current script results
-                    i += 1
-                    if name == "Dos":  # TODO change to ddos
-                        name = self.script_names[i]
-                        i += 1
-                    rate, avg_time = results[name]  # results
-                except:
-                    continue
-                rate *= 100  # change from fraction to percentage
-
-                # pie chart attributes
-                fig, ax = plt.subplots()
-                labels = ["Vulnerable", "resistant"]
-                sizes = [rate, 100 - rate]
-                colors = ['red', 'green']  # red for attack success
-                explode = [0.1, 0]
-
-                # create pie chart
-                ax.pie(sizes, explode=explode, labels=labels, colors=colors,
-                       autopct='%1.1f%%', shadow=False, startangle=90)
-                # title and annotation of the plot
-                ax.set_title(name)
-                fig.text(0.5, 0.03, f'Average successful execution time: {avg_time:.2f}', ha='center')
-                canvas = FigureCanvasQTAgg(fig)
-                self.layout.addWidget(canvas, row, col)
-
-    def add_canvas(self, canvas: FigureCanvasQTAgg, row, col):
-        self.layout.addWidget(canvas, row, col)
 
     def clear(self):
         # Remove all widgets from the layout

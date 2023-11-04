@@ -1,7 +1,6 @@
 import pickle
 import requests
 import validators
-from PyQt6.QtGui import QColor
 
 from GUI_Package import *
 from Main.main_GUI import MainWindow
@@ -10,10 +9,7 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from Cyber_Scripts import *
 
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-import matplotlib.pyplot as plt
 import matplotlib
-
 matplotlib.use('Qt5Agg')
 
 # TODO: set size of progress bar
