@@ -279,7 +279,8 @@ class TabUI(QWidget):
         for script in self.script_names:
             self.files_paths[script] = file_path(script)
             if not os.path.exists(self.files_paths[script]):
-                open(self.files_paths[script], "w")
+                file = open(self.files_paths[script], "w")
+                file.close()
 
     def load_items(self):
         # self.scripts.setCurrentRow(1)
