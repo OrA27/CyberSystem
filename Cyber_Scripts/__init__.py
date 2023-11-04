@@ -95,8 +95,8 @@ def enter_login_input(login_page_url, user_name, password):
         new_url = new_url.split("?")[0]
         passed = login_page_url != new_url
         return passed
-    except:
-        pass
+    except Exception as e:
+        print("Error: ", e)
     finally:
         # Close the browser window
         driver.quit()
