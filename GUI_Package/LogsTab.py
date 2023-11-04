@@ -1,5 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextEdit, QPushButton
-# from Cyber_Scripts.SQL_Injection import execute
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTextEdit
 
 
 class LogsTab(QWidget):
@@ -11,7 +10,6 @@ class LogsTab(QWidget):
         self.text_field = QTextEdit()
         self.text_field.setReadOnly(True)
         self.layout.addWidget(self.text_field)
-        print(self.text_field)
 
     def clear(self):
         self.text_field.clear()

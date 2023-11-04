@@ -2,7 +2,6 @@ from PyQt6 import QtGui
 from PyQt6.QtWidgets import QTabWidget
 from GUI_Package.AIOTab import *
 from GUI_Package.OutputTab import OutputTab
-from cyber_attacks_container import CyberContainer
 from GUI_Package.LogsTab import LogsTab
 import sys
 
