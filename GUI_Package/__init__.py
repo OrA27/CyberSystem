@@ -1,68 +1,6 @@
-from PyQt6.QtWidgets import *
-from PyQt6.QtCore import Qt
+import importlib
+import os
 import pkgutil
-
-
-class HorizontalBox(QWidget):
-    def __init__(self, box_type, label_text, func=None):
-        super().__init__()
-
-        self.layout = QHBoxLayout(self)
-        self.setLayout(self.layout)
-        self.box_type = box_type
-        self.label = QLabel(label_text)
-        self.func = func
-
-        if box_type == "IP":
-            self.button = QPushButton("")
-            self.button.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
-
-            self.button.setToolTip("Remove this address")  # set tool tip
-            self.button.clicked.connect(self.remove)  # bind action to button click
-
-            # style the button and set icon
-            self.button.setFixedSize(50, 50)
-            self.button.setStyleSheet("border-radius: 25px; background-color: transparent;")
-            # set size of label
-            self.label.setFixedWidth(190)
-            self.label.setToolTip(self.label.text())
-            # add widgets to layout
-            self.layout.addWidget(self.label)
-            self.layout.addWidget(self.button, alignment=Qt.AlignmentFlag.AlignLeft)
-
-        elif box_type == 'script':
-            self.button = QCheckBox()  # create the button
-            self.button.setText(label_text)
-            # TODO add connect function to the button
-
-            # add widgets to layout
-            self.layout.addWidget(self.button, alignment=Qt.AlignmentFlag.AlignLeft)
-            # self.layout.addWidget(self.label, alignment=Qt.AlignmentFlag.AlignLeft)
-            self.layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-            self.layout.setContentsMargins(0, 10, 0, 10)
-
-        else:
-            raise Exception("box type invalid")
-
-    def remove(self):
-        if self.box_type == "IP":
-            parent_layout = self.parent()
-            parent_layout.layout.removeWidget(self)
-            self.func()
-        else:
-            raise Exception("Function and box type mismatch")
-
-
-class VerticalBox(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        self.layout = QVBoxLayout(self)
-        self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.setLayout(self.layout)
-
-    def add_row(self, row: QWidget):
-        self.layout.addWidget(row)
 
 
 def list_package_modules(package_name):
@@ -75,3 +13,37 @@ def list_package_modules(package_name):
         if not ispkg:
             modules.append(modname)
     return modules
+
+
+def get_script_module(script_name):
+    full_name = f"Cyber_Scripts.{script_name}"
+    module = importlib.import_module(full_name)
+    return module
+
+
+def execute_script(script_name, arg):
+    module = get_script_module(script_name)
+    return module.execute(*arg)
+
+
+def file_path(file_name: str):
+    # replace spaces
+    file_name = file_name.replace(" ", "_")
+
+    # Define the path to the current Python file
+    current_file_path = os.path.abspath(__file__)
+
+    # Get the directory containing the current Python file
+    current_directory = os.path.dirname(current_file_path)
+
+    # Get the parent directory of the current directory
+    parent_directory = os.path.dirname(current_directory)
+
+    # Define the path to the new folder and the new file
+    new_folder_path = os.path.join(parent_directory, "Saved")
+    new_file_path = os.path.join(new_folder_path, (file_name + ".pkl"))
+
+    # Create the new folder
+    os.makedirs(new_folder_path, exist_ok=True)
+
+    return new_file_path

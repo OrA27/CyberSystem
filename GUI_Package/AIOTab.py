@@ -1,15 +1,14 @@
 import pickle
-
 import requests
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
+import validators
+from PyQt6.QtGui import QColor
 
 from GUI_Package import *
-from PyQt6.QtCore import Qt, QItemSelectionModel, pyqtSignal, QObject, QThread
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QHBoxLayout, QStyle, QListWidgetItem, \
-    QCheckBox
-from Cyber_Scripts import *
-import validators
 from Main.main_GUI import MainWindow
+
+from PyQt6.QtCore import *
+from PyQt6.QtWidgets import *
+from Cyber_Scripts import *
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 import matplotlib.pyplot as plt
@@ -17,42 +16,7 @@ import matplotlib
 
 matplotlib.use('Qt5Agg')
 
-
-# TODO: clean up code
 # TODO: set size of progress bar
-
-def get_script_module(script_name):
-    full_name = f"Cyber_Scripts.{script_name}"
-    module = importlib.import_module(full_name)
-    return module
-
-
-def execute_script(script_name, arg):
-    module = get_script_module(script_name)
-    return module.execute(*arg)
-
-
-def file_path(file_name: str):
-    # replace spaces
-    file_name = file_name.replace(" ", "_")
-
-    # Define the path to the current Python file
-    current_file_path = os.path.abspath(__file__)
-
-    # Get the directory containing the current Python file
-    current_directory = os.path.dirname(current_file_path)
-
-    # Get the parent directory of the current directory
-    parent_directory = os.path.dirname(current_directory)
-
-    # Define the path to the new folder and the new file
-    new_folder_path = os.path.join(parent_directory, "Saved")
-    new_file_path = os.path.join(new_folder_path, (file_name+".pkl"))
-
-    # Create the new folder
-    os.makedirs(new_folder_path, exist_ok=True)
-
-    return new_file_path
 
 
 class Worker(QObject):
@@ -60,8 +24,7 @@ class Worker(QObject):
     progressed = pyqtSignal(float)
     finished = pyqtSignal(str)
     grid_sized = pyqtSignal(int, int, int)
-    analyzed = pyqtSignal(FigureCanvasQTAgg, int, int)
-    analyzed2 = pyqtSignal(dict)
+    analyzed = pyqtSignal(dict)
     ddos_painted = pyqtSignal(list)
 
     def __init__(self, scripts: list, targets: dict, total: int):
@@ -111,16 +74,12 @@ class Worker(QObject):
                     count += 1
 
             self.set_grid_size()
-            # self.send_ddos_graphs()
             self.ddos_painted.emit(self.ddos_graphs)
             self.export_data()
             self.finished.emit('done')
 
         except:
             return
-
-    # def send_ddos_graphs(self):
-    #     self.dd
 
     def export_data(self):
         results = {}
@@ -130,7 +89,7 @@ class Worker(QObject):
             data_list: list = self.raw_data[script]
             if len(data_list) == 0:
                 continue
-            # (success rate, avg success time)
+
             success_rate = 0
             avg_time = 0
             for data in data_list:
@@ -141,51 +100,7 @@ class Worker(QObject):
             success_rate /= len(data_list)
             results[script] = (success_rate, avg_time)
 
-        # self.analyze(results)
-        self.analyzed2.emit(results)
-
-    def analyze(self, results):
-        rows, cols = self.set_grid_size()
-        # results look like this -> result[script] = (success rate, average time)
-        # currently passed means the attack failed
-        i = 0
-        for row in range(rows):
-            for col in range(cols):
-                # start with ddos
-                if i < len(self.ddos_graphs):
-                    graph = self.ddos_graphs[i]
-                    i += 1
-                    canvas = FigureCanvasQTAgg(graph)
-                    self.analyzed.emit(canvas, row, col)
-                    continue
-
-                # continue with other scripts
-                try:
-                    name = self.scripts[i]  # name of current script results
-                    i += 1
-                    if name == "Dos":  # TODO change to ddos
-                        name = self.scripts[i]
-                        i += 1
-                    rate, avg_time = results[name]  # results
-                except:
-                    continue
-                rate *= 100  # change from fraction to percentage
-
-                # pie chart attributes
-                fig, ax = plt.subplots()
-                labels = ["Vulnerable", "resistant"]
-                sizes = [rate, 100 - rate]
-                colors = ['red', 'green']  # red for attack success
-                explode = [0.1, 0]
-
-                # create pie chart
-                ax.pie(sizes, explode=explode, labels=labels, colors=colors,
-                       autopct='%1.1f%%', shadow=False, startangle=90)
-                # title and annotation of the plot
-                ax.set_title(name)
-                fig.text(0.5, 0.03, f'Average successful execution time: {avg_time:.2f}', ha='center')
-                canvas = FigureCanvasQTAgg(fig)
-                self.analyzed.emit(canvas, row, col)
+        self.analyzed.emit(results)
 
     def set_grid_size(self):
         graphs_amount = (len(self.scripts) - 1) + self.ddos_active  # amount of scripts - ddos + active ddos targets
@@ -205,7 +120,7 @@ class AIOTab(QWidget):
         self.layout = QVBoxLayout(self)
 
         # create UI box
-        self.ui = TabUI(self)  # self.cyber_container)
+        self.ui = TabUI(self)
         # create button
         self.begin_button = QPushButton("Begin")
         self.begin_button.clicked.connect(self.begin)
@@ -225,11 +140,11 @@ class TabUI(QWidget):
         # attributes
         self.script_names = list_package_modules("Cyber_Scripts")
         self.active_script = self.script_names[0]
-        self.raw_data = {}  # key: script ;; value: list of data objects
-        self.container: MainWindow = self.parent().parent()
         self.aio: AIOTab = self.parent()
+        self.container: MainWindow = self.parent().parent()
         self.log: QTextEdit = self.container.logs.text_field
         self.files_paths: dict = {}
+        self.data_lists = {}
 
         # create main layout
         self.layout = QHBoxLayout(self)  # main layout
@@ -251,28 +166,16 @@ class TabUI(QWidget):
 
         self.load_ui()
 
-        # create and add "existing target objects"
+        # create and add "existing target objects" & "active_form_widget"
         self.existing_targets_widget = self.existing_targets[self.active_script]
         self.active_form_widget = self.forms[self.active_script]
         self.scripts.setCurrentRow(0)
         self.existing_targets_widget.show()
 
-        # connect event functions
-        self.scripts.itemClicked.connect(self.script_selected)
-
-        # create and add "new target objects"
-        self.new_targets = None  # once a script is selected create instance of NewTarget()
-
-        # self.layout.addWidget(self.target_list_widget)
-        self.setLayout(self.layout)
-
-        # initialize data list for scripts
-        self.data_lists = {}
-
-        # Get/Set save files
+        # Get/Set save files' paths
         self.create_save_files()
 
-        # test
+        # load all existing item
         self.load_items()
 
     def create_save_files(self):
@@ -283,11 +186,6 @@ class TabUI(QWidget):
                 file.close()
 
     def load_items(self):
-        # self.scripts.setCurrentRow(1)
-        # test_data = Data("Dos")
-        # test_data.field_dict["address"] = "9"
-        # self.forms["Dos"].add_item(test_data)
-
         for index, script in enumerate(self.script_names):
             self.scripts.setCurrentRow(index)
             self.data_lists[script] = []
@@ -302,7 +200,7 @@ class TabUI(QWidget):
                         pass
             except (FileNotFoundError, IOError):
                 # Handle errors or the case where the file doesn't exist
-                print(self.files_paths[script] + "not found")
+                self.log.append(self.files_paths[script] + "not found\n\n")
         self.scripts.setCurrentRow(0)
 
     def save_another_item(self, data):
@@ -366,21 +264,11 @@ class TabUI(QWidget):
         self.existing_targets_widget = self.existing_targets[self.active_script]
         self.existing_targets_widget.show()
 
-    # def save_item(self): implemented in newTarget class
-
     def load_form(self):
         self.active_form_widget.hide()
         self.active_form_widget = self.forms[self.active_script]
         self.active_form_widget.clear_text_fields()
         self.active_form_widget.show()
-
-    def save_data(self):
-        """save all the data in the ui"""
-        pass
-
-    def load_data(self):
-        """load saved data to the ui"""
-        pass
 
     def select_all(self):
         targets: QListWidget = self.existing_targets_widget
@@ -395,37 +283,6 @@ class TabUI(QWidget):
             item = targets.item(index)
             widget: TargetListItem = targets.itemWidget(item)
             widget.active_checkbox.setChecked(False)
-
-    def begin(self):
-        try:
-            self.container.output.clear()  # must be in this class
-            self.container.logs.clear()  # must be in this class
-            print(self.container.findChildren(QTextEdit))  # redundant
-            # can be transferred to worker
-            for script in self.script_names:  # send scripts to worker
-                # needs to be changed -> send self.existing targets to worker
-                qlist: QListWidget = self.existing_targets[script]
-                self.raw_data[script] = []
-                if qlist.count() == 0:
-                    continue
-                for i in range(2, qlist.count()):
-                    item = qlist.item(i)
-                    widget: TargetListItem = qlist.itemWidget(item)
-                    data: Data = widget.data
-                    if widget.active_checkbox.isChecked():
-                        if script == "Dos":
-                            pass
-                        start = time.time()
-                        data.passed = execute_script(script, widget.data_to_tuple(), output=self.log)
-                        finish = time.time()
-                        data.time = finish - start
-                        self.log.append(f'attack time: {data.time:.2f}\n\n')
-
-                        self.raw_data[script].append(data)
-        except:
-            return
-
-        self.export_data()
 
     def initiate_attacks(self):
         try:
@@ -442,23 +299,13 @@ class TabUI(QWidget):
             self.worker.logged.connect(self.write_log)
             self.worker.progressed.connect(self.percentage_done)
             self.worker.grid_sized.connect(self.container.output.set_grid)
-            self.worker.analyzed.connect(self.container.output.add_canvas)
-
-            self.worker.analyzed2.connect(self.container.output.analyze)
-
-            self.worker.finished.connect(self.done)
+            self.worker.analyzed.connect(self.container.output.analyze)
             self.worker.finished.connect(self.thread.quit)
             self.worker.finished.connect(self.worker.deleteLater)
             self.worker.finished.connect(self.return_to_default)
 
             # start thread
             self.thread.start()
-
-            # function currently only reads from the lists and then logs it in the log tab
-
-
-
-
         except:
             return
 
@@ -468,9 +315,6 @@ class TabUI(QWidget):
     def percentage_done(self, percentage):
         self.bar.setValue(int(percentage))
         self.log.append(f'{percentage:.1f}% done')
-
-    def done(self, txt):
-        self.log.append(txt)
 
     def count_active_targets(self):
         counter = 0
@@ -494,25 +338,6 @@ class TabUI(QWidget):
             active_list.append(label)
         else:
             active_list.remove(label)
-        print(active_list)
-
-    def export_data(self):
-        results = {}
-        for script in self.script_names:
-            data_list: list = self.raw_data[script]
-            if len(data_list) == 0:
-                continue
-            # (success rate, avg success time)
-            success_rate = 0
-            avg_time = 0
-            for data in data_list:
-                if data.passed:
-                    success_rate += 1
-                    avg_time += data.time
-            avg_time /= success_rate
-            success_rate /= len(data_list)
-            results[script] = (success_rate, avg_time)
-        self.container.output.analyze(results)  # enable later
 
     def attack_setup(self):
         # clear logs tab
@@ -530,8 +355,6 @@ class TabUI(QWidget):
 
         # show progress bar
         self.bar.show()
-
-        # self.container.tabs.setCurrentIndex(1)
 
     def return_to_default(self):
         # hide progress bar
@@ -558,12 +381,12 @@ class Data:
                 self.field_dict = {"address": None, "view image": None}
             case "Data Interception":
                 self.field_dict = {"address": None}
-            case "Dos":
+            case "Dos":  # TODO: change to ddos
                 self.field_dict = {"address": None}
             case "Rainbow Table":
                 self.field_dict = {"address": None, "user name": None, "hashed password": None}
             case _:
-                print("error")
+                print(f"ERROR - There is no such script {script}")  # dev only error
         self.passed = None
         self.time = None
 
@@ -683,7 +506,7 @@ class NewTarget(QWidget):
                         response = requests.get(text)
                         if response.status_code != 200:
                             valid = False
-                    except:
+                    except:  # TODO: decide whether to remove or keep this exception
                         # validate with validators
                         print("No response from address")
                         valid = validators.ipv4(text) or validators.url(text)
@@ -693,6 +516,7 @@ class NewTarget(QWidget):
 
                 case "hashed password":
                     valid = text != ""
+
             valid_list.append(valid)
             if not valid:
                 field.clear()
@@ -708,12 +532,10 @@ class NewTarget(QWidget):
 
     def click(self):
         if not self.validate():
-            print("fault")
             return
         new_data = Data(self.script)
         for label in self.field_dict.keys():
             new_data.field_dict[label] = self.field_dict[label].text()
-            # print(label + " : " + self.data.field_dict[label])
         self.add_item(new_data)
 
     def add_item(self, data, saved=False):
