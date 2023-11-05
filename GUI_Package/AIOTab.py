@@ -633,6 +633,14 @@ class TargetListItem(QWidget):
                 return False
         return True
 
+    def set_tooltip(self):
+        tooltip_string = ''
+        for key, value in self.data.field_dict.items():
+            if key == 'passed':
+                break
+            tooltip_string += f'{key}: {value}\n'
+        self.parent_item.setToolTip(tooltip_string[:-1])
+
 
 class NewTarget(QWidget):
     def __init__(self, script, parent_list: QListWidget):
@@ -728,3 +736,4 @@ class NewTarget(QWidget):
         self.parent_list.setItemWidget(item, widget)
         self.parent_list.parent().item_added(saved=saved, item=item)
         self.clear_text_fields()
+        widget.set_tooltip()
