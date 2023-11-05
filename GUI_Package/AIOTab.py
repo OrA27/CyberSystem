@@ -59,7 +59,7 @@ class Worker(QObject):
                             self.logged.emit("beginning of attack")  # TODO: Amit change this
 
                             start = time.time()  # start measure time
-                            data.passed = bool(count % 3)  # execute_script(script, data_tuple)  # perform attack
+                            data.passed = execute_script(script, data_tuple)  # perform attack
                             finish = time.time()  # end measure time
                             data.time = finish - start  # get measurement
 
