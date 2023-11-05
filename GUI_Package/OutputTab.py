@@ -43,19 +43,13 @@ class OutputTab(QWidget):
                 if i < self.ddos_amount:
                     graph = self.ddos_graphs[i]
                     i += 1
-                    # widget = QWidget()
-                    # layout = QVBoxLayout()
-                    # widget.setLayout(layout)
-                    # layout.addWidget(graph)
-                    # ddos_canvas = FigureCanvasQTAgg(graph)
-                    # self.layout.addWidget(ddos_canvas, row, col)
                     self.layout.addWidget(graph, row, col)
                     continue
 
                 try:
                     name = self.script_names[i]  # name of current script results
                     i += 1
-                    if name == "Dos":
+                    if name == "DDoS":
                         name = self.script_names[i]
                         i += 1
 

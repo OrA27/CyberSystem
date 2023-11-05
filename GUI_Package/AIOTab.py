@@ -50,7 +50,7 @@ class Worker(QObject):
 
                     if widget.active_checkbox.isChecked():
                         data_tuple = widget.data_to_tuple()
-                        if script == "Dos":  # TODO: change this when dos module name is changed
+                        if script == "DDoS":
                             self.ddos_active += 1
                             result = execute_script(script, data_tuple)
                             self.ddos_results.append(result)
@@ -85,7 +85,7 @@ class Worker(QObject):
     def export_data(self):
         results = {}
         for script in self.scripts:
-            if script == "Dos":  # TODO: change dos to DDoS
+            if script == "DDoS":
                 continue
             data_list: list = self.raw_data[script]
             if len(data_list) == 0:
@@ -329,40 +329,6 @@ class TabUI(QWidget):
             num_of_samples = result[3]
             response_avgs_between_threads = result[4]
 
-            """plt.plot(iter_list, response_times_list)
-
-            # naming the time in sec axis
-            plt.xlabel('Threads')
-
-            # naming the response time in ms axis
-            plt.ylabel('Response time')
-
-            # giving a title to my graph
-            plt.title('Server response time depending on threads')
-
-            # Set the x-axis limits to start at 0 and end at 110
-            plt.xlim(0, num_of_samples)
-
-            # Set tick marks on the x-axis at every 10 units
-            plt.xticks(range(0, num_of_samples + 1, response_avgs_between_threads))
-
-            # Enable minor ticks at intervals of 0.5 units
-            minor_locator = MultipleLocator(1)
-            plt.gca().xaxis.set_minor_locator(minor_locator)
-
-            # Create custom labels for the major ticks
-            major_tick_locations = range(response_avgs_between_threads,
-                                         (num_of_threads * response_avgs_between_threads + 1)
-                                         , response_avgs_between_threads)
-            major_tick_labels = [f'Th{(loc // response_avgs_between_threads) - 1}' for loc in major_tick_locations]
-
-            # Set major tick marks on the x-axis and apply custom labels
-            plt.xticks(major_tick_locations, major_tick_labels)
-
-            plt.grid(which='both', linestyle=':', linewidth=0.5)
-
-            ddos_graphs.append(plt)"""
-
             fig = Figure()
             ax = fig.add_subplot(111)
 
@@ -401,18 +367,7 @@ class TabUI(QWidget):
 
             ax.grid(which='both', linestyle=':', linewidth=0.5)
 
-            """
-            ax.plot(iter_list, response_times_list)
-            ax.set_xlabel('Threads')
-            ax.set_ylabel('Response time')
-            ax.set_title('Server response time depending on threads')
-            ax.set_xlim(0, num_of_samples)
-            ax.set_xticks(range(0, num_of_samples + 1, response_avgs_between_threads))
-            ax.grid(which='both', linestyle=':', linewidth=0.5)
-            """
-
             canvas = FigureCanvasQTAgg(fig)
-            # canvas.setFixedSize(300, 300)
 
             ddos_graphs.append(canvas)
 
@@ -491,7 +446,7 @@ class Data:
                 self.field_dict = {"address": None, "view image": None}
             case "Data Interception":
                 self.field_dict = {"address": None}
-            case "Dos":  # TODO: change to ddos
+            case "DDoS":
                 self.field_dict = {"address": None, "port": None}
             case "Rainbow Table":
                 self.field_dict = {"address": None, "user name": None, "hashed password": None}
