@@ -1,6 +1,9 @@
 import pickle
 import requests
 import validators
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
+from matplotlib.backends.backend_template import FigureCanvas
+from matplotlib.figure import Figure
 
 from GUI_Package import *
 from Main.main_GUI import MainWindow
@@ -9,6 +12,8 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from Cyber_Scripts import *
 
+from matplotlib.ticker import MultipleLocator
+import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Qt5Agg')
 
@@ -21,7 +26,7 @@ class Worker(QObject):
     finished = pyqtSignal(str)
     grid_sized = pyqtSignal(int, int, int)
     analyzed = pyqtSignal(dict)
-    ddos_painted = pyqtSignal(list)
+    ddos_done = pyqtSignal(list)
 
     def __init__(self, scripts: list, targets: dict, total: int):
         super().__init__()
@@ -29,7 +34,7 @@ class Worker(QObject):
         self.targets = targets
         self.total = total
         self.ddos_active = 0
-        self.ddos_graphs = []
+        self.ddos_results = []
         self.raw_data = {}
 
     def attack(self):
@@ -49,21 +54,21 @@ class Worker(QObject):
                         if script == "Dos":  # TODO: change this when dos module name is changed
                             self.ddos_active += 1
                             result = execute_script(script, data_tuple)
-                            self.ddos_graphs.append(result)
+                            self.ddos_results.append(result)
+                        else:
+                            # beginning of attack
+                            self.logged.emit("beginning of attack")  # TODO: Amit change this
 
-                        # beginning of attack
-                        self.logged.emit("beginning of attack")  # TODO: Amit change this
+                            start = time.time()  # start measure time
+                            data.passed = execute_script(script, data_tuple)  # perform attack
+                            finish = time.time()  # end measure time
+                            data.time = finish - start  # get measurement
 
-                        start = time.time()  # start measure time
-                        data.passed = execute_script(script, data_tuple)  # perform attack
-                        finish = time.time()  # end measure time
-                        data.time = finish - start  # get measurement
+                            # ending attack
+                            self.logged.emit("ending of attack")  # TODO: Amit change this
+                            self.logged.emit(f'attack time: {data.time:.2f}\n\n')
 
-                        # ending attack
-                        self.logged.emit("ending of attack")  # TODO: Amit change this
-                        self.logged.emit(f'attack time: {data.time:.2f}\n\n')
-
-                        self.raw_data[script].append(data)
+                            self.raw_data[script].append(data)
 
                     self.logged.emit(data.get_address())
                     self.progressed.emit((count / self.total) * 100)
@@ -73,9 +78,8 @@ class Worker(QObject):
 
         try:
             self.set_grid_size()
-            self.ddos_painted.emit(self.ddos_graphs)
-            self.export_data()
-            self.finished.emit('done')
+            self.ddos_done.emit(self.ddos_results)
+            # self.export_data()
         except Exception as e:
             self.logged.emit(f"ERROR: {e}")
 
@@ -99,6 +103,7 @@ class Worker(QObject):
             results[script] = (success_rate, avg_time)
 
         self.analyzed.emit(results)
+        self.finished.emit('done')
 
     def set_grid_size(self):
         graphs_amount = (len(self.scripts) - 1) + self.ddos_active  # amount of scripts - ddos + active ddos targets
@@ -133,6 +138,7 @@ class AIOTab(QWidget):
 
 
 class TabUI(QWidget):
+    set_ddos_graphs = pyqtSignal()
     def __init__(self, parent):
         super().__init__(parent=parent)
         # attributes
@@ -299,6 +305,8 @@ class TabUI(QWidget):
             self.worker.progressed.connect(self.percentage_done)
             self.worker.grid_sized.connect(self.container.output.set_grid)
             self.worker.analyzed.connect(self.container.output.analyze)
+            self.worker.ddos_done.connect(self.create_ddos_graphs)
+            self.set_ddos_graphs.connect(self.worker.export_data)
             self.worker.finished.connect(self.thread.quit)
             self.worker.finished.connect(self.worker.deleteLater)
             self.worker.finished.connect(self.return_to_default)
@@ -308,6 +316,105 @@ class TabUI(QWidget):
         except Exception as e:
             self.log.append(f'ERROR: {e}')
             return
+
+    def create_ddos_graphs(self, results):
+        ddos_graphs = []
+        for result in results:
+            iter_list = result[0]
+            response_times_list = result[1]
+            num_of_threads = result[2]
+            num_of_samples = result[3]
+            response_avgs_between_threads = result[4]
+
+            """plt.plot(iter_list, response_times_list)
+
+            # naming the time in sec axis
+            plt.xlabel('Threads')
+
+            # naming the response time in ms axis
+            plt.ylabel('Response time')
+
+            # giving a title to my graph
+            plt.title('Server response time depending on threads')
+
+            # Set the x-axis limits to start at 0 and end at 110
+            plt.xlim(0, num_of_samples)
+
+            # Set tick marks on the x-axis at every 10 units
+            plt.xticks(range(0, num_of_samples + 1, response_avgs_between_threads))
+
+            # Enable minor ticks at intervals of 0.5 units
+            minor_locator = MultipleLocator(1)
+            plt.gca().xaxis.set_minor_locator(minor_locator)
+
+            # Create custom labels for the major ticks
+            major_tick_locations = range(response_avgs_between_threads,
+                                         (num_of_threads * response_avgs_between_threads + 1)
+                                         , response_avgs_between_threads)
+            major_tick_labels = [f'Th{(loc // response_avgs_between_threads) - 1}' for loc in major_tick_locations]
+
+            # Set major tick marks on the x-axis and apply custom labels
+            plt.xticks(major_tick_locations, major_tick_labels)
+
+            plt.grid(which='both', linestyle=':', linewidth=0.5)
+
+            ddos_graphs.append(plt)"""
+
+            fig = Figure()
+            ax = fig.add_subplot(111)
+
+            # Plot code here
+
+            ax.plot(iter_list, response_times_list)
+
+            # naming the time in sec axis
+            ax.set_xlabel('Threads')
+
+            # naming the response time in ms axis
+            ax.set_ylabel('Response time')
+
+            # giving a title to my graph
+            ax.set_title('Server response time depending on threads')
+
+            # Set the x-axis limits to start at 0 and end at 110
+            ax.set_xlim(0, num_of_samples)
+
+            # Set tick marks on the x-axis at every 10 units
+            ax.set_xticks(range(0, num_of_samples + 1, response_avgs_between_threads))
+
+            # Enable minor ticks at intervals of 1 unit
+            minor_locator = MultipleLocator(1)
+            ax.xaxis.set_minor_locator(minor_locator)
+
+            # Create custom labels for the major ticks
+            major_tick_locations = range(response_avgs_between_threads,
+                                         (num_of_threads * response_avgs_between_threads + 1)
+                                         , response_avgs_between_threads)
+            major_tick_labels = [f'Th{(loc // response_avgs_between_threads) - 1}' for loc in major_tick_locations]
+
+            # Set major tick marks on the x-axis and apply custom labels
+            ax.set_xticks(major_tick_locations)
+            ax.set_xticklabels(major_tick_labels)
+
+            ax.grid(which='both', linestyle=':', linewidth=0.5)
+
+            """
+            ax.plot(iter_list, response_times_list)
+            ax.set_xlabel('Threads')
+            ax.set_ylabel('Response time')
+            ax.set_title('Server response time depending on threads')
+            ax.set_xlim(0, num_of_samples)
+            ax.set_xticks(range(0, num_of_samples + 1, response_avgs_between_threads))
+            ax.grid(which='both', linestyle=':', linewidth=0.5)
+            """
+
+            canvas = FigureCanvasQTAgg(fig)
+            # canvas.setFixedSize(300, 300)
+
+            ddos_graphs.append(canvas)
+
+        self.container.output.get_ddos_graphs(ddos_graphs)
+        self.set_ddos_graphs.emit()
 
     def write_log(self, txt):
         self.log.append(txt)
@@ -382,7 +489,7 @@ class Data:
             case "Data Interception":
                 self.field_dict = {"address": None}
             case "Dos":  # TODO: change to ddos
-                self.field_dict = {"address": None}
+                self.field_dict = {"address": None, "port": None}
             case "Rainbow Table":
                 self.field_dict = {"address": None, "user name": None, "hashed password": None}
             case _:

@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QGridLayout
+from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 import matplotlib.pyplot as plt
 import matplotlib
@@ -17,6 +17,9 @@ class OutputTab(QWidget):
         # layout
         self.layout = QGridLayout(self)
 
+    def get_ddos_graphs(self, graphs):
+        self.ddos_graphs = graphs
+
     def set_grid(self, rows, cols, ddos_amount):
         self.rows = rows
         self.cols = cols
@@ -32,8 +35,13 @@ class OutputTab(QWidget):
                 if i < self.ddos_amount:
                     graph = self.ddos_graphs[i]
                     i += 1
-                    ddos_canvas = FigureCanvasQTAgg(graph)
-                    self.layout.addWidget(ddos_canvas, row, col)
+                    # widget = QWidget()
+                    # layout = QVBoxLayout()
+                    # widget.setLayout(layout)
+                    # layout.addWidget(graph)
+                    # ddos_canvas = FigureCanvasQTAgg(graph)
+                    # self.layout.addWidget(ddos_canvas, row, col)
+                    self.layout.addWidget(graph, row, col)
                     continue
 
                 try:

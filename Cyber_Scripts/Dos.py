@@ -7,6 +7,8 @@ import http.client
 import threading
 import matplotlib.pyplot as plt
 
+global threads_run
+
 
 def dos(server_ip, server_port):
 
@@ -18,7 +20,8 @@ def dos(server_ip, server_port):
         "\r\n"
     ).format(server_ip)
 
-    while True:
+    global threads_run
+    while threads_run:
         rand_num1 = random.randint(1, 254)
         rand_num2 = random.randint(1, 254)
         rand_num3 = random.randint(1, 254)
@@ -54,7 +57,7 @@ def get_response_time(server_ip, server_port, path="/"):
         return response_time
 
     except Exception as e:
-        print(f"An error occurred: {e}")
+        # print(f"An error occurred: {e}")
         return None
 
 
@@ -66,7 +69,8 @@ def response_time_iterate(server_ip, port, q):
     while _iter < 100:
         response_time = get_response_time(server_ip, port)
         if response_time is None:
-            print("error")
+            # print("error")
+            pass
         else:
             # print(f"response time: {response_time}")
             if avg_iter<10:
@@ -82,6 +86,11 @@ def response_time_iterate(server_ip, port, q):
 
 
 def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_threads=10, samples_for_avg=10):
+    global threads_run
+    threads_run = True
+    # server_port must be int
+    server_port = int(server_port)
+
     # sample iterations
     _iter = 1
 
@@ -116,7 +125,8 @@ def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_thr
             while avg_iter < samples_for_avg:
                 response_time = get_response_time(server_ip, server_port)
                 if response_time is None:
-                    print("error")
+                    # print("error")
+                    pass
                 else:
                     res_sum += response_time
                     avg_iter += 1
@@ -129,52 +139,16 @@ def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_thr
             iter_list.append(_iter - 1)
             # append the response time average to the list
             response_times_list.append(res_avg)
-            # print the response time average
-            print(f"response time: %.2f" % res_avg)
 
             # starting dos thread at the required time
             if num_of_samples > _iter >= response_avgs_between_threads and _iter % response_avgs_between_threads == 0:
-                print(f"\n\n\nadd dos thread number {(_iter // 10) - 1}\n\n\n")
                 dos_threads[(_iter // response_avgs_between_threads) - 1].start()
             _iter += 1
 
         except KeyboardInterrupt:
             break
 
-    print(iter_list)
-    print(response_times_list)
-    plt.plot(iter_list, response_times_list)
+    # stop all threads
+    threads_run = False
 
-    # naming the time in sec axis
-    plt.xlabel('Threads')
-
-    # naming the response time in ms axis
-    plt.ylabel('Response time')
-
-    # giving a title to my graph
-    plt.title('Server response time depending on threads')
-
-    # Set the x-axis limits to start at 0 and end at 110
-    plt.xlim(0, num_of_samples)
-
-    # Set tick marks on the x-axis at every 10 units
-    plt.xticks(range(0, num_of_samples + 1, response_avgs_between_threads))
-
-    # Enable minor ticks at intervals of 0.5 units
-    minor_locator = MultipleLocator(1)
-    plt.gca().xaxis.set_minor_locator(minor_locator)
-
-    # Create custom labels for the major ticks
-    major_tick_locations = range(response_avgs_between_threads, (num_of_threads * response_avgs_between_threads + 1)
-                                 , response_avgs_between_threads)
-    major_tick_labels = [f'Th{(loc // response_avgs_between_threads) - 1}' for loc in major_tick_locations]
-
-    # Set major tick marks on the x-axis and apply custom labels
-    plt.xticks(major_tick_locations, major_tick_labels)
-
-    plt.grid(which='both', linestyle=':', linewidth=0.5)
-
-    return plt
-
-# plot = execute("10.100.102.19", 8000)
-# plot.show()
+    return iter_list, response_times_list, num_of_threads, num_of_samples, response_avgs_between_threads
