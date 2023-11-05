@@ -73,7 +73,7 @@ class OutputTab(QWidget):
 
                 # create pie chart
                 ax.pie(sizes, explode=explode, labels=labels, colors=colors,
-                       autopct='%1.1f%%', shadow=False, startangle=90)
+                       autopct='%1.1f%%', shadow=False, startangle=45)
                 # title and annotation of the plot
                 ax.set_title(name)
                 fig.text(0.5, 0.03, f'Average successful execution time: {avg_time:.2f}', ha='center')
@@ -82,7 +82,6 @@ class OutputTab(QWidget):
 
     def clear(self):
         # Remove all widgets from the layout
-        self.scroll_area.hide()
         for i in reversed(range(self.layout.count())):
             widget = self.layout.itemAt(i).widget()
             if widget is not None:

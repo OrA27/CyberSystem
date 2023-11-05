@@ -59,7 +59,7 @@ class Worker(QObject):
                             self.logged.emit("beginning of attack")  # TODO: Amit change this
 
                             start = time.time()  # start measure time
-                            data.passed = execute_script(script, data_tuple)  # perform attack
+                            data.passed = bool(count % 3)  # execute_script(script, data_tuple)  # perform attack
                             finish = time.time()  # end measure time
                             data.time = finish - start  # get measurement
 
@@ -474,7 +474,6 @@ class TabUI(QWidget):
         self.scripts.show()
         self.existing_targets_widget.show()
         self.active_form_widget.show()
-        self.container.output.scroll_area.show()
         self.aio.begin_button.show()
 
         # show out put tab
