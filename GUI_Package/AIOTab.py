@@ -15,9 +15,8 @@ from Cyber_Scripts import *
 from matplotlib.ticker import MultipleLocator
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('Qt5Agg')
 
-# TODO: set size of progress bar
+matplotlib.use('Qt5Agg')
 
 
 class Worker(QObject):
@@ -139,6 +138,7 @@ class AIOTab(QWidget):
 
 class TabUI(QWidget):
     set_ddos_graphs = pyqtSignal()
+
     def __init__(self, parent):
         super().__init__(parent=parent)
         # attributes
@@ -290,9 +290,12 @@ class TabUI(QWidget):
             widget.active_checkbox.setChecked(False)
 
     def initiate_attacks(self):
+        active_targets = self.count_active_targets()
+        if active_targets == 0:
+            return
         try:
             # create thread & worker here
-            self.worker = Worker(self.script_names, self.existing_targets, self.count_active_targets())
+            self.worker = Worker(self.script_names, self.existing_targets, active_targets)
             self.thread = QThread()
 
             # move worker to thread
@@ -471,6 +474,7 @@ class TabUI(QWidget):
         self.scripts.show()
         self.existing_targets_widget.show()
         self.active_form_widget.show()
+        self.container.output.scroll_area.show()
         self.aio.begin_button.show()
 
         # show out put tab

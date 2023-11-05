@@ -1,4 +1,5 @@
-from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QGridLayout, QScrollArea
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 import matplotlib.pyplot as plt
 import matplotlib
@@ -16,6 +17,13 @@ class OutputTab(QWidget):
 
         # layout
         self.layout = QGridLayout(self)
+
+        # add a scroll bar
+        self.scroll_area = QScrollArea(self)
+        self.scroll_area.setWidgetResizable(False)  # Allow resizing of the widget inside the scroll area
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area.hide()
 
     def get_ddos_graphs(self, graphs):
         self.ddos_graphs = graphs
@@ -74,6 +82,7 @@ class OutputTab(QWidget):
 
     def clear(self):
         # Remove all widgets from the layout
+        self.scroll_area.hide()
         for i in reversed(range(self.layout.count())):
             widget = self.layout.itemAt(i).widget()
             if widget is not None:
