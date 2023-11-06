@@ -69,10 +69,8 @@ def response_time_iterate(server_ip, port, q):
     while _iter < 100:
         response_time = get_response_time(server_ip, port)
         if response_time is None:
-            # print("error")
             pass
         else:
-            # print(f"response time: {response_time}")
             if avg_iter<10:
                 res_sum += response_time
                 avg_iter += 1

@@ -42,34 +42,48 @@ class Worker(QObject):
             try:
                 self.raw_data[script] = []
                 qlist: QListWidget = self.targets[script]
-                self.logged.emit(f"{script} now begins")
+                if qlist.count() > 2:
+                    self.logged.emit(f"{script} checks:\n")
                 for i in range(2, qlist.count()):
                     item = qlist.item(i)
                     widget: TargetListItem = qlist.itemWidget(item)
                     data: Data = widget.data
 
                     if widget.active_checkbox.isChecked():
+
+                        # log data fields
+                        vals_str = ""
+                        keys_list = data.field_dict.keys()
+                        final_val = list(keys_list)[-1]
+                        for val in keys_list:
+                            # self.logged.emit(f"{val}: {data.field_dict[val]}")
+                            vals_str += f"{val}: {data.field_dict[val]}"
+                            if val != final_val:
+                                vals_str += "\n"
+                        self.logged.emit(vals_str)
+
                         data_tuple = widget.data_to_tuple()
                         if script == "DDoS":
                             self.ddos_active += 1
                             result = execute_script(script, data_tuple)
                             self.ddos_results.append(result)
                         else:
-                            # beginning of attack
-                            self.logged.emit("beginning of attack")  # TODO: Amit change this
 
+                            # beginning of attack
                             start = time.time()  # start measure time
                             data.passed = execute_script(script, data_tuple)  # perform attack
                             finish = time.time()  # end measure time
                             data.time = finish - start  # get measurement
-
                             # ending attack
-                            self.logged.emit("ending of attack")  # TODO: Amit change this
-                            self.logged.emit(f'attack time: {data.time:.2f}\n\n')
+
+                            if data.passed:
+                                self.logged.emit("The Site is vulnerable to the attack")
+                            else:
+                                self.logged.emit("The Site is not vulnerable to the attack")
+                            self.logged.emit(f'attack time: {data.time:.2f}\n')
 
                             self.raw_data[script].append(data)
 
-                    self.logged.emit(data.get_address())
                     self.progressed.emit((count / self.total) * 100)
                     count += 1
             except Exception as e:
@@ -379,7 +393,6 @@ class TabUI(QWidget):
 
     def percentage_done(self, percentage):
         self.bar.setValue(int(percentage))
-        self.log.append(f'{percentage:.1f}% done')
 
     def count_active_targets(self):
         counter = 0

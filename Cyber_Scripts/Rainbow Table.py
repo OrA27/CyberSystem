@@ -69,25 +69,14 @@ def hash_lookup(hashed):
 
 
 def execute(login_page_url, user_name, hashed):
-    # output.append('Rainbow Table Check')
-    # output.append(f'Login page url: {login_page_url}')
-    # output.append(f'User name: {user_name}')
-    # output.append(f'Hashed password: {hashed}')
 
     fake_password = hash_lookup(hashed)
     if not fake_password:
-        # print("Match password was not found")
         return False
 
     # lookup successful -> go through login flow
     # try to log in
     passed = enter_login_input(login_page_url, user_name, fake_password)
-    if passed:
-        # output.append("The Site is vulnerable to the attack\n\n")
-        pass
-    else:
-        # output.append("The Site is not vulnerable to the attack\n\n")
-        pass
     return passed
 
 

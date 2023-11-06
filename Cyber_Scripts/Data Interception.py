@@ -8,18 +8,6 @@ import threading
 from Cyber_Scripts import *
 from PyQt6.QtWidgets import QTextEdit
 
-"""
-def send_data(login_page_url):
-    driver, user_name_element, password_element, submit_button = get_login_elements(login_page_url)
-    user_name_element.send_keys("user name")  # Enter the username
-    password_element.send_keys("password")  # Enter password
-    submit_button.click()
-
-    time.sleep(1)  # wait for the page to load
-
-    driver.quit()
-"""
-
 
 def get_internal_ipv4():
     try:
@@ -49,9 +37,6 @@ def packet_filter(packet, your_ip, server_ip):
 
 
 def execute(login_page_url):
-    # output.append('Data Interception Check')
-    # output.append(f'Domain: {domain}')
-    # output.append(f'Login page url: {login_page_url}')
     domain = login_page_url.split("/")[2]
     values_found = 0
     response = None
@@ -84,13 +69,7 @@ def execute(login_page_url):
                 values_found += 1
         else:
             break
-    if values_found == 2:
-        # print("attack succeeded")
-        # output.append("The Site is vulnerable to the attack\n\n")
-        return True
-    else:
-        # print("attack failed")
-        # output.append("The site is not vulnerable to the attack\n\n")
-        return False
+    return values_found == 2
 
-execute(login_page_url='http://seatassist.byethost32.com/pages/index.php')
+
+# execute(login_page_url='http://seatassist.byethost32.com/pages/index.php')
