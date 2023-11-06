@@ -1,5 +1,5 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QGridLayout, QScrollArea
+from PyQt6.QtWidgets import *
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 import matplotlib.pyplot as plt
 import matplotlib
@@ -16,14 +16,17 @@ class OutputTab(QWidget):
         self.rows, self.cols = 0, 0
 
         # layout
-        self.layout = QGridLayout(self)
+        self.layout = QGridLayout()
+        self.main_layout = QVBoxLayout(self)
 
         # add a scroll bar
-        self.scroll_area = QScrollArea(self)
-        self.scroll_area.setWidgetResizable(False)  # Allow resizing of the widget inside the scroll area
-        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.scroll_area.hide()
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_widget = QWidget()
+        self.scroll_widget.setLayout(self.layout)
+        self.scroll_area.setWidget(self.scroll_widget)
+        self.main_layout.addWidget(self.scroll_area)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
 
     def get_ddos_graphs(self, graphs):
         self.ddos_graphs = graphs
@@ -38,7 +41,9 @@ class OutputTab(QWidget):
         # currently passed means the attack failed
         i = 0
         for row in range(self.rows):
+            self.layout.setRowMinimumHeight(row, 250)
             for col in range(self.cols):
+                self.layout.setColumnMinimumWidth(col, 378)
                 # start with ddos
                 if i < self.ddos_amount:
                     graph = self.ddos_graphs[i]
