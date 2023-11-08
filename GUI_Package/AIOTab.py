@@ -586,17 +586,23 @@ class NewTarget(QWidget):
             field.setPlaceholderText("")
             match key:
                 case "address" | "view image":
-                    # validate with requests
                     try:
-                        ip_address = socket.gethostbyname(text)
-                        internal_ip_prefixes = ["192.168", "10.0", "127.0.0"]
-                        internal_ip_prefixes += ["172." + str(num) for num in range(16, 32)]
+                        if validators.ipv4(text):
+                            ip_address = text
+                        else:
+                            url = text.split("/", 2)[2:][0]
+                            ip_address = socket.gethostbyname(url)
+
+                        internal_ip_prefixes = ["192.168.", "10.0.", "127.0.0."]
+                        internal_ip_prefixes += ["172." + f"{num}." for num in range(16, 32)]
 
                         for prefix in internal_ip_prefixes:
                             if ip_address.startswith(prefix):
                                 valid = True
                                 break
+
                     except Exception as e:
+                        valid = False
                         ui: TabUI = self.parent_list.parent()  # for readability purposes
                         ui.log.append(f'ERROR: {e}')
 
