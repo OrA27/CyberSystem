@@ -74,14 +74,17 @@ class Worker(QObject):
                             finish = time.time()  # end measure time
                             data.time = finish - start  # get measurement
                             # ending attack
-
-                            if data.passed:
-                                self.logged.emit("The Site is vulnerable to the attack")
+                            if type(data.passed) != bool:
+                                self.logged.emit(f"The Check stopped. Error: {data.passed}")
+                                data.passed = None
                             else:
-                                self.logged.emit("The Site is not vulnerable to the attack")
-                            self.logged.emit(f'attack time: {data.time:.2f}\n')
+                                if data.passed:
+                                    self.logged.emit("The Site is vulnerable to the attack")
+                                else:
+                                    self.logged.emit("The Site is not vulnerable to the attack")
+                                self.logged.emit(f'attack time: {data.time:.2f}\n')
 
-                            self.raw_data[script].append(data)
+                                self.raw_data[script].append(data)
 
                     self.progressed.emit((count / self.total) * 100)
                     count += 1
