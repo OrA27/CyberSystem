@@ -69,15 +69,17 @@ def hash_lookup(hashed):
 
 
 def execute(login_page_url, user_name, hashed):
+    try:
+        fake_password = hash_lookup(hashed)
+        if not fake_password:
+            return False
 
-    fake_password = hash_lookup(hashed)
-    if not fake_password:
-        return False
-
-    # lookup successful -> go through login flow
-    # try to log in
-    passed = enter_login_input(login_page_url, user_name, fake_password)
-    return passed
+        # lookup successful -> go through login flow
+        # try to log in
+        passed = enter_login_input(login_page_url, user_name, fake_password)
+        return passed
+    except:
+        return None
 
 
 # create_table(words_list=["a", "zzzzzzzzzzzzzzzzzHg8", "b", "zzzzzzzzzzzzzzzzzzzr"], hash_type="md5", sub_hash=5)

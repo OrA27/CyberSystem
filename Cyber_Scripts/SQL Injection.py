@@ -14,7 +14,7 @@ def execute(login_page_url, user_name):
         for injection in injections:
             passed = enter_login_input(login_page_url, injection[0], injection[1])
             return passed
-    except Exception as e:
-        return e
+    except:
+        return None
 
 # execute(login_page_url="http://localhost/site/login.php")

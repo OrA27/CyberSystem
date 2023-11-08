@@ -75,8 +75,7 @@ class Worker(QObject):
                             data.time = finish - start  # get measurement
                             # ending attack
                             if type(data.passed) != bool:
-                                self.logged.emit(f"The Check stopped. Error: {data.passed}")
-                                data.passed = None
+                                self.logged.emit(f"The Check stopped due to an Error. make sure the server is running.\n")
                             else:
                                 if data.passed:
                                     self.logged.emit("The Site is vulnerable to the attack")

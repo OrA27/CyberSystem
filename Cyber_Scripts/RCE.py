@@ -40,7 +40,7 @@ def execute(upload_page_url, view_page_url):
         page_src = driver.page_source
         passed = "injection.php" in page_src
         return passed
-    except Exception as e:
-        return e
+    except:
+        return None
 
 # execute(upload_page_url='http://localhost/site/upload.html', view_page_url='http://localhost/site/view_image.php')

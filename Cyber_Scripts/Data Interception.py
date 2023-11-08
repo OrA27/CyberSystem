@@ -37,39 +37,42 @@ def packet_filter(packet, your_ip, server_ip):
 
 
 def execute(login_page_url):
-    domain = login_page_url.split("/")[2]
-    values_found = 0
-    response = None
-    while not response:
-        # Craft a DNS query
-        dns_query = IP(dst='8.8.8.8') / UDP(sport=RandShort(), dport=53) / DNS(rd=1, qd=DNSQR(qname=domain))
+    try:
+        domain = login_page_url.split("/")[2]
+        values_found = 0
+        response = None
+        while not response:
+            # Craft a DNS query
+            dns_query = IP(dst='8.8.8.8') / UDP(sport=RandShort(), dport=53) / DNS(rd=1, qd=DNSQR(qname=domain))
 
-        # Send the DNS query and receive the response
-        response = sr1(dns_query, timeout=1, verbose=0)
+            # Send the DNS query and receive the response
+            response = sr1(dns_query, timeout=1, verbose=0)
 
-    # Parse the response to obtain the IPv4 address
-    if response and DNSRR in response:
-        server_ip = response[DNSRR].rdata
-    else:
-        server_ip = "0.0.0.0"
-
-    my_ip = get_internal_ipv4()
-    send_data_thread = threading.Thread(target=enter_login_input, args=[login_page_url, "user name", "password"])
-    send_data_thread.start()
-    post_packet = sniff(filter=f"tcp", lfilter=lambda pkt: packet_filter(pkt, my_ip, server_ip), count=1)
-
-    packet_content = post_packet[0]["Raw"].load.decode()
-    packet_parts = packet_content.split("\r\n")
-    packet_variables_part = packet_parts[-1]
-    text_variables = packet_variables_part.split("&")
-    for text_variable in text_variables:
-        variable_vals = text_variable.split("=")
-        if len(variable_vals) > 1:
-            if variable_vals[1] in ["user+name", "password"]:
-                values_found += 1
+        # Parse the response to obtain the IPv4 address
+        if response and DNSRR in response:
+            server_ip = response[DNSRR].rdata
         else:
-            break
-    return values_found == 2
+            server_ip = "0.0.0.0"
+
+        my_ip = get_internal_ipv4()
+        send_data_thread = threading.Thread(target=enter_login_input, args=[login_page_url, "user name", "password"])
+        send_data_thread.start()
+        post_packet = sniff(filter=f"tcp", lfilter=lambda pkt: packet_filter(pkt, my_ip, server_ip), count=1)
+
+        packet_content = post_packet[0]["Raw"].load.decode()
+        packet_parts = packet_content.split("\r\n")
+        packet_variables_part = packet_parts[-1]
+        text_variables = packet_variables_part.split("&")
+        for text_variable in text_variables:
+            variable_vals = text_variable.split("=")
+            if len(variable_vals) > 1:
+                if variable_vals[1] in ["user+name", "password"]:
+                    values_found += 1
+            else:
+                break
+        return values_found == 2
+    except:
+        return None
 
 
 # execute(login_page_url='http://seatassist.byethost32.com/pages/index.php')
