@@ -13,7 +13,7 @@ global threads_run
 def dos(server_ip, server_port):
 
     # Craft an HTTP GET request packet
-    tcp_packet = TCP(dport=server_port, sport=12345)  # Use a source port of your choice
+    tcp_packet = TCP(dport=server_port, sport=12345)
     get_request = (
         "GET / HTTP/1.1\r\n"
         "Host: {}\r\n"
@@ -86,6 +86,7 @@ def response_time_iterate(server_ip, port, q):
 def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_threads=10, samples_for_avg=10):
     global threads_run
     threads_run = True
+
     # server_port must be int
     server_port = int(server_port)
 

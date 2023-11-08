@@ -49,7 +49,7 @@ def hash_word(word, hash_type):
 def create_table(words_list=None, hash_type="md5", sub_hash=None):
     new_file_path = get_table_path()
 
-    # write teh words in the word list into the file
+    # write the words in the word list into the file
     with open(new_file_path, "w") as rt:
         for word in words_list:
             word_hash = hash_word(word, hash_type)[0:sub_hash]

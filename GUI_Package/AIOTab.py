@@ -56,7 +56,6 @@ class Worker(QObject):
                         keys_list = data.field_dict.keys()
                         final_val = list(keys_list)[-1]
                         for val in keys_list:
-                            # self.logged.emit(f"{val}: {data.field_dict[val]}")
                             vals_str += f"{val}: {data.field_dict[val]}"
                             if val != final_val:
                                 vals_str += "\n"
@@ -92,7 +91,6 @@ class Worker(QObject):
         try:
             self.set_grid_size()
             self.ddos_done.emit(self.ddos_results)
-            # self.export_data()
         except Exception as e:
             self.logged.emit(f"ERROR: {e}")
 
@@ -137,6 +135,7 @@ class AIOTab(QWidget):
 
         # create UI box
         self.ui = TabUI(self)
+
         # create button
         self.begin_button = QPushButton("Begin")
         self.begin_button.clicked.connect(self.begin)
