@@ -580,7 +580,7 @@ class NewTarget(QWidget):
     def validate(self):
         valid_list = []
         for key in self.field_dict.keys():
-            valid = True
+            valid = False
             field: QLineEdit = self.field_dict[key]
             text = field.text()
             field.setPlaceholderText("")
@@ -588,13 +588,20 @@ class NewTarget(QWidget):
                 case "address" | "view image":
                     # validate with requests
                     try:
-                        response = requests.get(text)
-                        if response.status_code != 200:
-                            valid = False
-                    except:  # TODO: decide whether to remove or keep this exception
-                        # validate with validators
-                        print("No response from address")
-                        valid = validators.ipv4(text) or validators.url(text)
+                        ip_address = socket.gethostbyname(text)
+                        internal_ip_prefixes = ["192.168", "10.0", "127.0.0"]
+                        internal_ip_prefixes += ["172." + str(num) for num in range(16, 32)]
+
+                        for prefix in internal_ip_prefixes:
+                            if ip_address.startswith(prefix):
+                                valid = True
+                                break
+                    except Exception as e:
+                        ui: TabUI = self.parent_list.parent()  # for readability purposes
+                        ui.log.append(f'ERROR: {e}')
+
+                case "port":
+                    valid = int(text) in range(1, 65536)
 
                 case "user name":
                     valid = text != ""
