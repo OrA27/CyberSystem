@@ -28,7 +28,7 @@ class OutputTab(QWidget):
         self.main_layout.addWidget(self.scroll_area)
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
 
-    def get_ddos_graphs(self, graphs):
+    def set_ddos_graphs(self, graphs):
         self.ddos_graphs = graphs
 
     def set_grid(self, rows, cols, ddos_amount):

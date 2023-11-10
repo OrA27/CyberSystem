@@ -64,7 +64,8 @@ class Worker(QObject):
                         data_tuple = widget.data_to_tuple()
                         if script == "DDoS":
                             self.ddos_active += 1
-                            result = execute_script(script, data_tuple)
+                            result = execute_script(script, data_tuple, output=self.logged)
+                            self.logged.emit("\n")
                             self.ddos_results.append(result)
                         else:
 
@@ -386,7 +387,7 @@ class TabUI(QWidget):
 
             ddos_graphs.append(canvas)
 
-        self.container.output.get_ddos_graphs(ddos_graphs)
+        self.container.output.set_ddos_graphs(ddos_graphs)
         self.set_ddos_graphs.emit()
 
     def write_log(self, txt):
@@ -631,8 +632,8 @@ class NewTarget(QWidget):
             field.setPlaceholderText(txt)
 
     def click(self):
-        if not self.validate():
-            return
+        # if not self.validate():
+        #     return
         new_data = Data(self.script)
         for label in self.field_dict.keys():
             new_data.field_dict[label] = self.field_dict[label].text()

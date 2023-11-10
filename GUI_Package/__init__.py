@@ -21,9 +21,12 @@ def get_script_module(script_name):
     return module
 
 
-def execute_script(script_name, arg):
+def execute_script(script_name, arg, output = None):
     module = get_script_module(script_name)
-    return module.execute(*arg)
+    if not output:
+        return module.execute(*arg)
+    else:
+        return module.execute(*arg, output=output)
 
 
 def file_path(file_name: str):

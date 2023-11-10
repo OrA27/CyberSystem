@@ -83,7 +83,7 @@ def response_time_iterate(server_ip, port, q):
             time.sleep(0.1)
 
 
-def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_threads=10, samples_for_avg=10):
+def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_threads=10, samples_for_avg=10, output = None):
     global threads_run
     threads_run = True
 
@@ -141,7 +141,10 @@ def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_thr
 
             # starting dos thread at the required time
             if num_of_samples > _iter >= response_avgs_between_threads and _iter % response_avgs_between_threads == 0:
-                dos_threads[(_iter // response_avgs_between_threads) - 1].start()
+                thread_num = _iter // response_avgs_between_threads
+                dos_threads[thread_num - 1].start()
+                if output:
+                    output.emit(f"DoS thread number {thread_num} is running")
             _iter += 1
 
         except KeyboardInterrupt:
