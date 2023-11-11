@@ -596,25 +596,20 @@ class NewTarget(QWidget):
                         if validators.ipv4(text):
                             ip_address = text
                         else:
-                            url = text.split("/", 2)[2:][0]
+                            url = text.split("/")[2:][0]
                             ip_address = socket.gethostbyname(url)
 
-                        host_name = socket.gethostname()
+                        if ip_address == "127.0.0.1":
+                            valid = True
+                        else:
+                            host_name = socket.gethostname()
 
-                        # Get local IP address using socket
-                        local_ip = socket.gethostbyname(host_name)
+                            # Get local IP address using socket
+                            local_ip = socket.gethostbyname(host_name)
 
-                        ip_address_parts = ip_address.split(".")
-                        local_ip_parts = local_ip.split(".")
-                        valid = ip_address_parts[0:2] == local_ip_parts[0:2]
-
-                        # internal_ip_prefixes = ["192.168.", "10.0.", "127.0.0."]
-                        # internal_ip_prefixes += ["172." + f"{num}." for num in range(16, 32)]
-
-                        # for prefix in internal_ip_prefixes:
-                        #     if ip_address.startswith(prefix):
-                        #         valid = True
-                        #         break
+                            ip_address_parts = ip_address.split(".")
+                            local_ip_parts = local_ip.split(".")
+                            valid = ip_address_parts[0:2] == local_ip_parts[0:2]
 
                     except Exception as e:
                         valid = False
