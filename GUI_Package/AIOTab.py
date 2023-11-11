@@ -60,13 +60,16 @@ class Worker(QObject):
                             if val != final_val:
                                 vals_str += "\n"
                         self.logged.emit(vals_str)
-
                         data_tuple = widget.data_to_tuple()
                         if script == "DDoS":
-                            self.ddos_active += 1
                             result = execute_script(script, data_tuple, output=self.logged)
                             self.logged.emit("\n")
-                            self.ddos_results.append(result)
+                            if type(result) == tuple:
+                                self.ddos_results.append(result)
+                                self.ddos_active += 1
+                            else:
+                                pass
+
                         else:
 
                             # beginning of attack
@@ -76,7 +79,7 @@ class Worker(QObject):
                             data.time = finish - start  # get measurement
                             # ending attack
                             if type(data.passed) != bool:
-                                self.logged.emit(f"The Check stopped due to an Error. make sure the server is running.\n")
+                                self.logged.emit(f"The Check stopped due to an Error\n")
                             else:
                                 if data.passed:
                                     self.logged.emit("The Site is vulnerable to the attack")
@@ -632,8 +635,8 @@ class NewTarget(QWidget):
             field.setPlaceholderText(txt)
 
     def click(self):
-        # if not self.validate():
-        #     return
+        if not self.validate():
+            return
         new_data = Data(self.script)
         for label in self.field_dict.keys():
             new_data.field_dict[label] = self.field_dict[label].text()
