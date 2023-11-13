@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.output, "Output")
 
         # create top label
-        self.message_of_the_day = QLabel("Testing testing one two three")
+        self.message_of_the_day = QLabel("Made by Or Alush & Amit Hayoun")
 
         # Create a vertical layout for the tab widget
         self.window_vbox = QVBoxLayout()
