@@ -82,5 +82,5 @@ def execute(login_page_url, user_name, hashed):
         return None
 
 
-# create_table(words_list=["a", "zzzzzzzzzzzzzzzzzHg8", "b", "zzzzzzzzzzzzzzzzzzzr"], hash_type="md5", sub_hash=5)
+# create_table(words_list=["a", "zzzzzzzzzzzzzzzzzHg8", "b", "G|", "zzzzzzzzzzzzzzzzzzzr"], hash_type="md5", sub_hash=5)
 # print(execute(login_page_url="http://localhost/site/login.php", user_name="c@c.c", hashed="fd391"))

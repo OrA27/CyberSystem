@@ -46,7 +46,7 @@ def port_discovery(address="127.0.0.1"):
 
 # Easier to change the browser here in case of an error
 def create_driver(page_url):
-    driver = webdriver.Firefox()
+    driver = webdriver.Edge()
     driver.get(page_url)
     time.sleep(1)  # wait for the page to load
     return driver
@@ -63,6 +63,19 @@ def enter_login_input(login_page_url, user_name, password):
         html_obj_name = input_elements[i].get_attribute("name")
         script = f"document.getElementsByName('{html_obj_name}')[0].type = 'text';"
         driver.execute_script(script)
+        if i == 1:
+            try:
+                script = f"document.getElementsByName('{html_obj_name}')[0].value = '{password}';"
+                driver.execute_script(script)
+            except:
+                input_elements[1].send_keys(password)
+        else:
+            try:
+                script = f"document.getElementsByName('{html_obj_name}')[0].value = '{user_name}';"
+                driver.execute_script(script)
+            except:
+                input_elements[0].send_keys(user_name)
+
 
     # Find and click the submit button
     button_elements = driver.find_elements(By.TAG_NAME, "button")
@@ -74,8 +87,6 @@ def enter_login_input(login_page_url, user_name, password):
         button_elements = [element for element in button_elements if element.is_displayed() and
                            (element.get_attribute("type") == "submit" or
                             element.get_attribute("disabled type") == "submit")]
-    input_elements[0].send_keys(user_name)
-    input_elements[1].send_keys(password)
 
     # perform login
     button_elements[-1].click()

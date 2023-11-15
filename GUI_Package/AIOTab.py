@@ -91,6 +91,7 @@ class Worker(QObject):
 
                     self.progressed.emit((count / self.total) * 100)
                     count += 1
+                self.logged.emit("\n")
             except Exception as e:
                 self.logged.emit(f"ERROR: {e}")
 
@@ -115,7 +116,10 @@ class Worker(QObject):
                 if data.passed:
                     success_rate += 1
                     avg_time += data.time
-            avg_time /= success_rate
+            try:
+                avg_time /= success_rate
+            except:
+                avg_time = 0
             success_rate /= len(data_list)
             results[script] = (success_rate, avg_time)
 
@@ -166,7 +170,7 @@ class TabUI(QWidget):
         self.aio: AIOTab = self.parent()
         self.container: MainWindow = self.parent().parent()
         self.log: QTextEdit = self.container.logs.text_field
-        self.files_paths: dict = {}
+        self.files_paths = {}
         self.data_lists = {}
 
         # create main layout
@@ -500,6 +504,7 @@ class TargetListItem(QWidget):
         # elements
         self.active_checkbox = QCheckBox()
         self.label = QLabel(self.data.get_address())
+        self.label.setFixedWidth(self.parent_list.width())
         delete_button = QPushButton("X")
         delete_button.setFixedWidth(50)
 
@@ -639,8 +644,8 @@ class NewTarget(QWidget):
             field.setPlaceholderText(txt)
 
     def click(self):
-        if not self.validate():
-            return
+        # if not self.validate():
+        #     return
         new_data = Data(self.script)
         for label in self.field_dict.keys():
             new_data.field_dict[label] = self.field_dict[label].text()

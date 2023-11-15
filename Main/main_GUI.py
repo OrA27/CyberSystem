@@ -35,11 +35,11 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.output, "Output")
 
         # create top label
-        self.message_of_the_day = QLabel("Made by Or Alush & Amit Hayoun")
+        self.top_lable = QLabel("Made by Or Alush & Amit Hayoun")
 
         # Create a vertical layout for the tab widget
         self.window_vbox = QVBoxLayout()
-        self.window_vbox.addWidget(self.message_of_the_day, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.window_vbox.addWidget(self.top_lable, alignment=Qt.AlignmentFlag.AlignCenter)
         self.window_vbox.addWidget(self.tabs)
 
         # Set the main window layout to the horizontal layout
