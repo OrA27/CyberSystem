@@ -42,7 +42,7 @@ class Worker(QObject):
             try:
                 self.raw_data[script] = []
                 qlist: QListWidget = self.targets[script]
-                if qlist.count() > 2:
+                if qlist.count() > 2: # TODO change this to check if the target active
                     self.logged.emit(f"{script} checks:\n")
                 for i in range(2, qlist.count()):
                     item = qlist.item(i)
@@ -89,8 +89,8 @@ class Worker(QObject):
 
                                 self.raw_data[script].append(data)
 
-                    self.progressed.emit((count / self.total) * 100)
-                    count += 1
+                        self.progressed.emit((count / self.total) * 100)
+                        count += 1
                 self.logged.emit("\n")
             except Exception as e:
                 self.logged.emit(f"ERROR: {e}")
@@ -644,8 +644,8 @@ class NewTarget(QWidget):
             field.setPlaceholderText(txt)
 
     def click(self):
-        # if not self.validate():
-        #     return
+        if not self.validate():
+            return
         new_data = Data(self.script)
         for label in self.field_dict.keys():
             new_data.field_dict[label] = self.field_dict[label].text()

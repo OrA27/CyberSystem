@@ -8,7 +8,7 @@ import threading
 from Cyber_Scripts import *
 from PyQt6.QtWidgets import QTextEdit
 
-
+"""
 def get_internal_ipv4():
     try:
         # Create a socket and connect to a remote server
@@ -23,7 +23,23 @@ def get_internal_ipv4():
     except Exception as e:
         print("Error:", e)
         return None
+"""
 
+
+def get_internal_ip():
+    try:
+        internal_ip = socket.gethostbyname(socket.gethostname())
+        return internal_ip
+    except socket.error:
+        return None
+
+
+def get_ip_address(url):
+    try:
+        ip_address = socket.gethostbyname(url)
+        return ip_address
+    except socket.error:
+        return None
 
 def packet_filter(packet, your_ip, server_ip):
     return (
@@ -40,6 +56,8 @@ def execute(login_page_url):
     try:
         domain = login_page_url.split("/")[2]
         values_found = 0
+
+        """
         response = None
         while not response:
             # Craft a DNS query
@@ -53,11 +71,17 @@ def execute(login_page_url):
             server_ip = response[DNSRR].rdata
         else:
             server_ip = "0.0.0.0"
+        """
 
-        my_ip = get_internal_ipv4()
+        # login_page_ip = get_ip_address(login_page_url)
+        domain = login_page_url.split("/")[2:][0]
+        login_page_ip = socket.gethostbyname(domain)
+        my_ip = get_internal_ip()
+        if not my_ip or not login_page_ip:
+            raise Exception
         send_data_thread = threading.Thread(target=enter_login_input, args=[login_page_url, "user name", "password"])
         send_data_thread.start()
-        post_packet = sniff(filter=f"tcp", lfilter=lambda pkt: packet_filter(pkt, my_ip, server_ip), count=1)
+        post_packet = sniff(filter=f"tcp", lfilter=lambda pkt: packet_filter(pkt, my_ip, login_page_ip), count=1)
 
         packet_content = post_packet[0]["Raw"].load.decode()
         packet_parts = packet_content.split("\r\n")
