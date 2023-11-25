@@ -1,5 +1,6 @@
 from PyQt6 import QtGui
 from PyQt6.QtWidgets import QTabWidget, QMainWindow, QApplication
+
 from GUI_Package.AIOTab import *
 from GUI_Package.OutputTab import OutputTab
 from GUI_Package.LogsTab import LogsTab
@@ -27,12 +28,14 @@ class MainWindow(QMainWindow):
         # Create tabs
         self.logs = LogsTab(self)
         self.input = AIOTab(self)
+        self.input.setObjectName("test")  # TODO delete this line
         self.output = OutputTab(self)
 
         # Add tabs to the tab widget
         self.tabs.addTab(self.input, "Input")
         self.tabs.addTab(self.logs, "Logs")
         self.tabs.addTab(self.output, "Output")
+
 
         # create top label
         self.top_lable = QLabel("Made by Or Alush & Amit Hayoun")

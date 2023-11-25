@@ -184,6 +184,7 @@ class TabUI(QWidget):
 
         # create and add "scripts"
         self.scripts = QListWidget(parent=self)
+        self.scripts.setObjectName("scripts_list")
         self.scripts.itemSelectionChanged.connect(self.script_selected)
         self.layout.addWidget(self.scripts)
 
@@ -507,6 +508,7 @@ class TargetListItem(QWidget):
         self.label.setFixedWidth(self.parent_list.width())
         delete_button = QPushButton("X")
         delete_button.setFixedWidth(50)
+        delete_button.setObjectName("delete_button")
 
         delete_button.clicked.connect(self.delete_item)
         self.active_checkbox.stateChanged.connect(self.checkbox_state_changed)

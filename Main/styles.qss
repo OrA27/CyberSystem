@@ -1,24 +1,41 @@
 QPushButton {
-    background-color: black;
+    background-color: #333333;
     color: white;
     border-style: outset;
     border-width: 2px;
     border-radius: 10px;
-    border-color: beige;
+    border-color: #444444;
     font: bold 14px;
-    min-width: 10em;
+    padding: 6px;
+}
+
+QToolTip {
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: #fdf7d2;
+    background-color: #fbf5b0;
+}
+
+#delete_button:hover{
+    background-color: #ff0000;
+    color: white;
+    border-style: outset;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: #ee0000;
+    font: bold 14px;
     padding: 6px;
 }
 
 QPushButton:hover {
-    background-color: darkslategrey;
+    background-color: #555555;
     color: white;
     border-style: outset;
     border-width: 2px;
     border-radius: 10px;
     border-color: beige;
     font: bold 14px;
-    min-width: 10em;
     padding: 6px;
 }
 
@@ -26,3 +43,80 @@ QPushButton:pressed {
     background-color: rgb(224, 0, 0);
     border-style: inset;
 }
+
+QListWidget{
+    background-color: #333333;
+    color: white;
+}
+
+#scripts_list::item:selected, #scripts_list::item:hover {
+    background-color: #555555;
+    color: #ffffff;
+}
+
+QLabel{
+    color: white;
+}
+
+* {
+    background-color: #333333;
+    border: None;
+    color: white;
+}
+
+QTabBar::tab:selected {
+    background-color: #333333;
+    border-style: outset;
+    border-width: 1px;
+    border-radius: 7px;
+    border-color: #444444;
+    border-bottom: none;
+    padding: 5px;
+}
+
+QTabBar::tab:!selected:hover
+{
+    background-color: #555555;
+}
+
+QTabBar::tab:!selected {
+    background-color: #333333;
+    border-style: outset;
+    border-width: 1px;
+    border-radius: 10px;
+    border-color: #444444;
+    padding: 5px;
+}
+
+QLineEdit {
+    background-color: #555555;
+    border-style: outset;
+    border-width: 1px;
+    border-radius: 10px;
+    border-color: #777777;
+}
+
+QMainWindow {
+    background: #333333;
+}
+
+QTabWidget::pane {
+    border: none;
+}
+
+QCheckBox {
+    background-color: #333333; /* Background color of the checkbox */
+    color: white; /* Text color of the checkbox */
+    spacing: 5px; /* Spacing between the checkbox and text */
+}
+
+/*QCheckBox::unchecked {
+    background-color: #333333; /* Background color when unchecked */
+    color: black;
+}
+
+QCheckBox::checked {
+    background-color: #333333; /* Background color when checked */
+    color: white;
+}*/
+
