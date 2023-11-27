@@ -10,10 +10,8 @@ QPushButton {
 }
 
 QToolTip {
-    border-style: outset;
-    border-width: 2px;
-    border-radius: 10px;
-    border-color: #fdf7d2;
+    /* border: 2px outset #fdf7d2;
+    border-radius: 10px; */
     background-color: #fbf5b0;
 }
 

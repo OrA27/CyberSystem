@@ -57,7 +57,7 @@ def packet_filter(packet, your_ip, server_ip):
             Raw in packet and
             b'POST' in packet["Raw"].load  # Check if "POST" is in the packet content
             or
-            number_of_packets>30
+            number_of_packets>40
             )
 
 

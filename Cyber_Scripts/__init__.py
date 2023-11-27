@@ -46,7 +46,7 @@ def port_discovery(address="127.0.0.1"):
 
 # Easier to change the browser here in case of an error
 def create_driver(page_url):
-    driver = webdriver.Edge()
+    driver = webdriver.Firefox()
     driver.get(page_url)
     time.sleep(1)  # wait for the page to load
     return driver
