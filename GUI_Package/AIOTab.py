@@ -505,7 +505,6 @@ class TargetListItem(QWidget):
         # elements
         self.active_checkbox = QCheckBox()
         self.label = QLabel(self.data.get_address())
-        self.label.setFixedWidth(self.parent_list.width())
         delete_button = QPushButton("X")
         delete_button.setFixedWidth(50)
         delete_button.setObjectName("delete_button")
@@ -516,6 +515,9 @@ class TargetListItem(QWidget):
         layout.addWidget(self.active_checkbox, alignment=Qt.AlignmentFlag.AlignLeft)
         layout.addWidget(self.label, alignment=Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(delete_button, alignment=Qt.AlignmentFlag.AlignRight)
+
+        self.label.setFixedWidth(100)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.setLayout(layout)
 
@@ -577,7 +579,7 @@ class NewTarget(QWidget):
         layout = QHBoxLayout()
         row.setLayout(layout)
         label_w = QLabel(label)
-        label_w.setFixedWidth(70)
+        label_w.setFixedWidth(100)
         text_w = QLineEdit()
         layout.addWidget(label_w)
         layout.addWidget(text_w)
