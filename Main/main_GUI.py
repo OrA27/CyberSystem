@@ -28,7 +28,6 @@ class MainWindow(QMainWindow):
         # Create tabs
         self.logs = LogsTab(self)
         self.input = AIOTab(self)
-        self.input.setObjectName("test")  # TODO delete this line
         self.output = OutputTab(self)
 
         # Add tabs to the tab widget

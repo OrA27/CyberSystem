@@ -41,6 +41,7 @@ class OutputTab(QWidget):
         # results look like this -> result[script] = (success rate, average time)
         # currently passed means the attack failed
         i = 0
+        j = 0
         for row in range(self.rows):
             self.layout.setRowMinimumHeight(row, 250)
             for col in range(self.cols):
@@ -53,11 +54,11 @@ class OutputTab(QWidget):
                     continue
 
                 try:
-                    name = self.script_names[i]  # name of current script results
-                    i += 1
+                    name = self.script_names[j]  # name of current script results
+                    j += 1
                     if name == "DDoS":
-                        name = self.script_names[i]
-                        i += 1
+                        name = self.script_names[j]
+                        j += 1
 
                     rate, avg_time = results[name]  # results
                 except:

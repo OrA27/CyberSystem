@@ -43,7 +43,7 @@ def get_ip_address(url):
     except socket.error:
         return None
 
-def packet_filter(packet, your_ip, server_ip):
+def packet_filter(packet, your_ip, server_ip, server_port):
     # print(packet.summary())
     global number_of_packets
     # print(number_of_packets)
@@ -51,13 +51,14 @@ def packet_filter(packet, your_ip, server_ip):
         IP in packet and
         packet[IP].src == your_ip and
         packet[IP].dst == server_ip and
+        packet[TCP].dport == server_port and
         TCP in packet):
             number_of_packets += 1
             return(
             Raw in packet and
             b'POST' in packet["Raw"].load  # Check if "POST" is in the packet content
             or
-            number_of_packets>40
+            number_of_packets>35
             )
 
 
@@ -86,6 +87,10 @@ def execute(login_page_url):
         """
 
         # login_page_ip = get_ip_address(login_page_url)
+        if login_page_url.split("://")[0][-1] == 's':
+            server_port = 443
+        else:
+            server_port = 80
         domain = login_page_url.split("/")[2:][0]
         login_page_ip = socket.gethostbyname(domain)
         my_ip = get_internal_ip()
@@ -93,7 +98,9 @@ def execute(login_page_url):
             raise Exception
         send_data_thread = threading.Thread(target=enter_login_input, args=[login_page_url, "user name", "password"])
         send_data_thread.start()
-        post_packet = sniff(filter=f"tcp", lfilter=lambda pkt: packet_filter(pkt, my_ip, login_page_ip), count=1)
+        post_packet = sniff(filter=f"tcp", lfilter=lambda pkt: packet_filter(pkt, my_ip, login_page_ip, server_port), count=1, timeout=25)
+        if not post_packet:
+            return False
         if post_packet[0].getlayer("Raw"):
             packet_content = post_packet[0]["Raw"].load.decode()
             packet_parts = packet_content.split("\r\n")

@@ -1,3 +1,4 @@
+import math
 import pickle
 import requests
 import validators
@@ -38,18 +39,23 @@ class Worker(QObject):
 
     def attack(self):
         count = 1
+        first_print = True
+        margin_str = ""
         for script in self.scripts:
             try:
                 self.raw_data[script] = []
                 qlist: QListWidget = self.targets[script]
-                if qlist.count() > 2: # TODO change this to check if the target active
-                    self.logged.emit(f"{script} checks:\n")
                 for i in range(2, qlist.count()):
                     item = qlist.item(i)
                     widget: TargetListItem = qlist.itemWidget(item)
                     data: Data = widget.data
 
                     if widget.active_checkbox.isChecked():
+                        # print headline and save margin in the end
+                        if first_print:
+                            self.logged.emit(f"{script} checks:\n")
+                            margin_str = "\n"
+                            first_print = False
 
                         # log data fields
                         vals_str = ""
@@ -91,7 +97,9 @@ class Worker(QObject):
 
                         self.progressed.emit((count / self.total) * 100)
                         count += 1
-                self.logged.emit("\n")
+                self.logged.emit(margin_str)
+                margin_str = ""
+                first_print = True
             except Exception as e:
                 self.logged.emit(f"ERROR: {e}")
 
@@ -128,10 +136,8 @@ class Worker(QObject):
 
     def set_grid_size(self):
         graphs_amount = (len(self.scripts) - 1) + self.ddos_active  # amount of scripts - ddos + active ddos targets
-        nearest_square = round(math.sqrt(graphs_amount)) ** 2
-        rows = cols = int(math.sqrt(nearest_square))
-        if graphs_amount > nearest_square:
-            cols += 1
+        cols = 2
+        rows = math.ceil(graphs_amount/cols)
         self.grid_sized.emit(rows, cols, self.ddos_active)
         return rows, cols
 
@@ -178,6 +184,7 @@ class TabUI(QWidget):
 
         # create progress bar
         self.bar = QProgressBar(self)
+        self.bar.setTextVisible(False)
         self.bar.setFixedWidth(786)
         self.layout.addWidget(self.bar)
         self.bar.hide()

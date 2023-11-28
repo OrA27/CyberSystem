@@ -60,6 +60,7 @@ QLabel{
     background-color: #333333;
     border: None;
     color: white;
+    font: bold 14px;
 }
 
 QTabBar::tab:selected {
@@ -108,13 +109,13 @@ QCheckBox {
     spacing: 5px; /* Spacing between the checkbox and text */
 }
 
-/*QCheckBox::unchecked {
-    background-color: #333333; /* Background color when unchecked */
-    color: black;
+QProgressBar {
+    border: 2px solid #a9a9a9; /* Border color */
+    border-radius: 5px; /* Border radius */
+    background-color: #d3d3d3; /* Background color */
 }
 
-QCheckBox::checked {
-    background-color: #333333; /* Background color when checked */
-    color: white;
-}*/
-
+QProgressBar::chunk {
+    background-color: #808080; /* Chunk color (filled part of the progress bar) */
+    border-radius: 5px; /* Border radius for the filled part */
+}

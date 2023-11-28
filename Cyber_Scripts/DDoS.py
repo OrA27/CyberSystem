@@ -166,4 +166,7 @@ def execute(server_ip, server_port, num_of_threads=10, response_avgs_between_thr
     # stop all threads
     threads_run = False
 
+    # recovery delay
+    time.sleep(2)
+
     return iter_list, response_times_list, num_of_threads, num_of_samples, response_avgs_between_threads
