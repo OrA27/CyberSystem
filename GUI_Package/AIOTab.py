@@ -633,7 +633,10 @@ class NewTarget(QWidget):
                         ui.log.append(f'ERROR: {e}')
 
                 case "port":
-                    valid = int(text) in range(1, 65536)
+                    try:
+                        valid = int(text) in range(1, 65536)
+                    except:
+                        valid = False
 
                 case "user name":
                     valid = text != ""
