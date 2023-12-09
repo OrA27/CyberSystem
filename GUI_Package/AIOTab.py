@@ -586,7 +586,7 @@ class NewTarget(QWidget):
         layout = QHBoxLayout()
         row.setLayout(layout)
         label_w = QLabel(label)
-        label_w.setFixedWidth(100)
+        label_w.setFixedWidth(120)
         text_w = QLineEdit()
         layout.addWidget(label_w)
         layout.addWidget(text_w)
