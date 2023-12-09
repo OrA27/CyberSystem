@@ -1,4 +1,5 @@
 from PyQt6 import QtGui
+from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QTabWidget, QMainWindow, QApplication
 
 from GUI_Package.AIOTab import *
@@ -48,6 +49,9 @@ class MainWindow(QMainWindow):
         self.main_widget = QWidget(self)
         self.main_widget.setLayout(self.window_vbox)
         self.setCentralWidget(self.main_widget)
+
+        # Set the window icon
+        self.setWindowIcon(QIcon("logo.jpg"))
 
 
 if __name__ == "__main__":
